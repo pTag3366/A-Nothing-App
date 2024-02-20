@@ -16,6 +16,7 @@
 		6A55CED82B7FC75C007EFBD4 /* NothingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A55CED72B7FC75C007EFBD4 /* NothingTests.swift */; };
 		6A55CEE22B7FC75C007EFBD4 /* NothingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A55CEE12B7FC75C007EFBD4 /* NothingUITests.swift */; };
 		6A55CEE42B7FC75C007EFBD4 /* NothingUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A55CEE32B7FC75C007EFBD4 /* NothingUITestsLaunchTests.swift */; };
+		6A55CEF12B7FD703007EFBD4 /* CustomTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A55CEF02B7FD703007EFBD4 /* CustomTextFieldView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		6A55CEDD2B7FC75C007EFBD4 /* NothingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NothingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A55CEE12B7FC75C007EFBD4 /* NothingUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NothingUITests.swift; sourceTree = "<group>"; };
 		6A55CEE32B7FC75C007EFBD4 /* NothingUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NothingUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		6A55CEF02B7FD703007EFBD4 /* CustomTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextFieldView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 				6A55CEC02B7FC756007EFBD4 /* AppDelegate.swift */,
 				6A55CEC22B7FC756007EFBD4 /* SceneDelegate.swift */,
 				6A55CEC42B7FC756007EFBD4 /* ViewController.swift */,
+				6A55CEF02B7FD703007EFBD4 /* CustomTextFieldView.swift */,
 				6A55CEC62B7FC756007EFBD4 /* Main.storyboard */,
 				6A55CEC92B7FC75C007EFBD4 /* Assets.xcassets */,
 				6A55CECB2B7FC75C007EFBD4 /* LaunchScreen.storyboard */,
@@ -259,6 +262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A55CEC52B7FC756007EFBD4 /* ViewController.swift in Sources */,
+				6A55CEF12B7FD703007EFBD4 /* CustomTextFieldView.swift in Sources */,
 				6A55CEC12B7FC756007EFBD4 /* AppDelegate.swift in Sources */,
 				6A55CEC32B7FC756007EFBD4 /* SceneDelegate.swift in Sources */,
 			);

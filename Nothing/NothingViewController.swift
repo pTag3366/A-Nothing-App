@@ -7,26 +7,26 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class NothingViewController: UIViewController {
     
     
     var widthConstraint: NSLayoutConstraint!
     var heightConstraint: NSLayoutConstraint!
     var centerXConstraint: NSLayoutConstraint!
     var centerYConstraint: NSLayoutConstraint!
+    var collectionView: UICollectionView!
     
-    
-    lazy var textField: CustomTextFieldView = {
+    lazy var textField: NothingTextFieldView = {
         let rect: CGRect = CGRect.zero
-        return CustomTextFieldView(frame: rect)
+        return NothingTextFieldView(frame: rect)
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        collectionView = NothingCollectionView(frame: view.bounds, 
+                                               collectionViewLayout: NothingCollectionView.collectionLayout())
+        view.addSubview(collectionView)
         // Do any additional setup after loading the view.
-        view.addSubview(textField)
-        activateConstraints()
-        addPinchAwayGestureRecognizer()
     }
     
     @objc func pinchAwayGesture() {
@@ -34,14 +34,8 @@ class ViewController: UIViewController {
         UIView.animate(withDuration: 1.0, delay: 0, usingSpringWithDamping: 0.75, initialSpringVelocity: 0, options: .curveEaseIn, animations: {
             self.textField.resignFirstResponder()
         }) { _ in
-//            UIView.ani
+
         }
-          
-//            self.textField.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 1).isActive = false
-//            self.textField.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 1).isActive = false
-//            self.textField.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = false
-//            self.textField.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = false
-//            self.textField.layoutIfNeeded()
     }
 
     func addPinchAwayGestureRecognizer() {

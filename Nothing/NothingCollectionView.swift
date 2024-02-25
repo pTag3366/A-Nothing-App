@@ -21,15 +21,19 @@ class NothingCollectionView: UICollectionView {
         super.init(frame: frame, collectionViewLayout: layout)
         dataSource = self
         delegate = self
-        register(NothingCollectionViewCell.self, forCellWithReuseIdentifier: NothingCollectionViewCell.collectionViewCellId)
-        register(NothingCollectionViewReusableView.self, forSupplementaryViewOfKind: NothingCollectionView.sectionHeader, withReuseIdentifier: NothingCollectionView.sectionHeader)
-        register(NothingCollectionViewReusableView.self, forSupplementaryViewOfKind: NothingCollectionView.sectionFooter, withReuseIdentifier: NothingCollectionView.sectionFooter)
+        register(NothingCollectionViewCell.self, 
+                 forCellWithReuseIdentifier: NothingCollectionViewCell.collectionViewCellId)
+        register(NothingCollectionViewReusableView.self,
+                 forSupplementaryViewOfKind: NothingCollectionView.sectionHeader,
+                 withReuseIdentifier: NothingCollectionView.sectionHeader)
+        register(NothingCollectionViewReusableView.self,
+                 forSupplementaryViewOfKind: NothingCollectionView.sectionFooter,
+                 withReuseIdentifier: NothingCollectionView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
-    
-    
     class func collectionLayout() -> UICollectionViewLayout {
+        
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
@@ -43,16 +47,16 @@ class NothingCollectionView: UICollectionView {
         
         let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.2)),
+                                               heightDimension: .fractionalHeight(0.1)),
             elementKind: NothingCollectionView.sectionHeader,
             alignment: .top)
         let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.2)),
+                                               heightDimension: .fractionalHeight(0.1)),
             elementKind: NothingCollectionView.sectionFooter,
             alignment: .bottom)
         
-        sectionHeader.pinToVisibleBounds = true
+//        sectionHeader.pinToVisibleBounds = true
         sectionHeader.zIndex = 2
         section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
         
@@ -85,7 +89,7 @@ extension NothingCollectionView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.collectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         else { return UICollectionViewCell() }
-        cell.label.text = indexPath.row.description + indexPath.section.description
+        cell.textField.placeholder = indexPath.row.description + indexPath.section.description
         
         return cell
     }

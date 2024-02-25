@@ -50,15 +50,9 @@ class NothingCollectionView: UICollectionView {
                                                heightDimension: .fractionalHeight(0.1)),
             elementKind: NothingCollectionView.sectionHeader,
             alignment: .top)
-        let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.1)),
-            elementKind: NothingCollectionView.sectionFooter,
-            alignment: .bottom)
-        
-//        sectionHeader.pinToVisibleBounds = true
+
         sectionHeader.zIndex = 2
-        section.boundarySupplementaryItems = [sectionHeader, sectionFooter]
+        section.boundarySupplementaryItems = [sectionHeader]
         
         let layout = UICollectionViewCompositionalLayout(section: section)
         
@@ -69,21 +63,21 @@ class NothingCollectionView: UICollectionView {
 extension NothingCollectionView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(ofKind: kind == NothingCollectionView.sectionHeader ? NothingCollectionView.sectionHeader : NothingCollectionView.sectionFooter,
-                                                                                withReuseIdentifier: kind == NothingCollectionView.sectionHeader ? NothingCollectionView.sectionHeader : NothingCollectionView.sectionFooter,
-                                                                                      for: indexPath) as? NothingCollectionViewReusableView 
+        guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(ofKind: NothingCollectionView.sectionHeader, 
+                                                                                      withReuseIdentifier: NothingCollectionView.sectionHeader,
+                                                                                      for: indexPath) as? NothingCollectionViewReusableView
         else { return UICollectionReusableView() }
-        supplementaryView.label.text = kind == NothingCollectionView.sectionHeader ? NothingCollectionView.sectionHeader : NothingCollectionView.sectionFooter
+        supplementaryView.label.text = NothingCollectionView.sectionHeader
         
         return supplementaryView
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 10
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

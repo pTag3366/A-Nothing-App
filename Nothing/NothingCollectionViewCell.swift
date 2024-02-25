@@ -21,36 +21,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
 //        contentView.layer.cornerRadius = 8
 //        layer.shadowOpacity = 0.2
 //        layer.shadowRadius = 6.0
-        contentMode = .redraw
-    }
-    
-    override func draw(_ layer: CALayer, in ctx: CGContext) {
-//        let layer = CALayer()
-        layer.frame = frame
-        layer.backgroundColor = UIColor.darkGray.cgColor
-             
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowRadius = 5
-        layer.shadowOpacity = 1
-             
-        let shadowHeight: CGFloat = 10
-        let shadowPath = CGMutablePath()
-        shadowPath.move(to: CGPoint(x: layer.shadowRadius,
-                                    y: -shadowHeight))
-        shadowPath.addLine(to: CGPoint(x: layer.shadowRadius,
-                                       y: shadowHeight))
-        shadowPath.addLine(to: CGPoint(x: layer.bounds.width - layer.shadowRadius,
-                                       y: shadowHeight))
-        shadowPath.addLine(to: CGPoint(x: layer.bounds.width - layer.shadowRadius,
-                                       y: -shadowHeight))
-             
-        shadowPath.addQuadCurve(to: CGPoint(x: layer.shadowRadius,
-                                            y: -shadowHeight),
-                                control: CGPoint(x: layer.bounds.width / 2,
-                                                 y: shadowHeight))
-             
-        layer.shadowPath = shadowPath
-//        self.layer.shadowPath = shadowPath
+        contentMode = .redraw //??
     }
     
     required init?(coder: NSCoder) {
@@ -73,6 +44,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
             textField.topAnchor.constraint(equalTo: topAnchor, constant: inset),
             textField.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset)
         ])
+        
         textField.font = UIFont.preferredFont(forTextStyle: .title3)
         textField.backgroundColor = .cyan
         textField.layer.borderWidth = 1.0
@@ -86,23 +58,23 @@ class NothingCollectionViewCell: UICollectionViewCell {
         textField.layer.shadowRadius = 5
         textField.layer.shadowOpacity = 1
                      
-        let shadowHeight: CGFloat = 10
+        let shadowHeight: CGFloat = 20
         let shadowPath = CGMutablePath()
-        shadowPath.move(to: CGPoint(x: layer.shadowRadius,
-                                    y: -shadowHeight))
-        shadowPath.addLine(to: CGPoint(x: layer.shadowRadius,
-                                       y: shadowHeight))
-        shadowPath.addLine(to: CGPoint(x: layer.bounds.width - layer.shadowRadius,
-                                       y: shadowHeight))
-        shadowPath.addLine(to: CGPoint(x: layer.bounds.width - layer.shadowRadius,
-                                       y: -shadowHeight))
         
-        shadowPath.addQuadCurve(to: CGPoint(x: layer.shadowRadius,
-                                            y: -shadowHeight),
-                                control: CGPoint(x: layer.bounds.width / 2,
-                                                 y: shadowHeight))
+        let viewHeight = frame.size.height
+        let p0 = CGPoint(x: layer.shadowRadius, y: -shadowHeight + viewHeight)
+        let p1 = CGPoint(x: layer.bounds.width, y: -shadowHeight + viewHeight)
+        let p2 = CGPoint(x: layer.bounds.width - layer.shadowRadius, y: shadowHeight + viewHeight)
+        let p3 = CGPoint(x: layer.shadowRadius, y: shadowHeight + viewHeight)
+        let q0 = CGPoint(x: layer.bounds.width, y: -shadowHeight + viewHeight)
+        let q1 = CGPoint(x: layer.bounds.width / 2, y: -shadowHeight + viewHeight)
+        
+        shadowPath.move(to: p0)
+        shadowPath.addLine(to: p1)
+        shadowPath.addLine(to: p2)
+             
+        shadowPath.addQuadCurve(to: p3, control: q1)
         
         textField.layer.shadowPath = shadowPath
-        //        self.layer.shadowPath = shadowPath
     }
 }

@@ -36,17 +36,6 @@ class NothingViewController: UIViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         
-//        print("view bounds: ", view.bounds)
-        
-//        if (!collectionView.visibleCells.isEmpty) {
-//            print("CollectionViewCell bounds: ", collectionView.visibleCells[0].contentView.bounds)
-//            let width = collectionView.visibleCells[0].contentView.bounds.width
-//            let height = collectionView.visibleCells[0].contentView.bounds.height
-//            print((abs(1-(width/height)))*min(width, height)+min(width, height))
-//            let newWidth = collectionView.bounds.width * (collectionView.bounds.height/collectionView.bounds.width)
-//            
-//            print("new width: ", newWidth)
-//        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -59,8 +48,8 @@ class NothingViewController: UIViewController {
 //            
 //        }
 //        collectionView.setNeedsDisplay()
-        print("viewDidAppear")
-        print("CollectionViewCell bounds: ", collectionView.visibleCells[0].contentView.bounds)
+//        print("viewDidAppear")
+//        print("CollectionViewCell bounds: ", collectionView.visibleCells[0].contentView.bounds)
     }
 }
 

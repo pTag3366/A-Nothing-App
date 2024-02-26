@@ -58,6 +58,7 @@ class NothingCollectionView: UICollectionView {
         
         return layout
     }
+    
 }
 
 extension NothingCollectionView: UICollectionViewDataSource {
@@ -73,11 +74,11 @@ extension NothingCollectionView: UICollectionViewDataSource {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return 10
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+        return 10
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -92,7 +93,6 @@ extension NothingCollectionView: UICollectionViewDataSource {
 }
 
 extension NothingCollectionView: UICollectionViewDelegate {
-    
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.collectionViewCellId, for: indexPath)

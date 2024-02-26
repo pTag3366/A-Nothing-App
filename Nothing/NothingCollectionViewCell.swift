@@ -47,32 +47,33 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
         textField.font = UIFont.preferredFont(forTextStyle: .title3)
         textField.backgroundColor = .cyan
-        textField.layer.borderWidth = 1.0
-        textField.layer.borderColor = CGColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
-        textField.layer.cornerRadius = 8
+        textField.layer.cornerRadius = 5
         
         textField.layer.frame = frame
         textField.layer.backgroundColor = UIColor.darkGray.cgColor
                      
         textField.layer.shadowColor = UIColor.black.cgColor
-        textField.layer.shadowRadius = 5
+        textField.layer.shadowRadius = 8
         textField.layer.shadowOpacity = 1
                      
-        let shadowHeight: CGFloat = 20
+        let shadowHeight: CGFloat = 20      //Height of the shadow's path to be drawn
         let shadowPath = CGMutablePath()
         
-        let viewHeight = frame.size.height
-        let p0 = CGPoint(x: layer.shadowRadius, y: -shadowHeight + viewHeight)
-        let p1 = CGPoint(x: layer.bounds.width, y: -shadowHeight + viewHeight)
-        let p2 = CGPoint(x: layer.bounds.width - layer.shadowRadius, y: shadowHeight + viewHeight)
-        let p3 = CGPoint(x: layer.shadowRadius, y: shadowHeight + viewHeight)
-        let q0 = CGPoint(x: layer.bounds.width, y: -shadowHeight + viewHeight)
-        let q1 = CGPoint(x: layer.bounds.width / 2, y: -shadowHeight + viewHeight)
+        let leadingXCoordinate = inset
+        let leadingYCoordinate = frame.height - textField.layer.shadowRadius - inset - inset //Substract top and bottom insets and shadowRadius
+        let trailingXCoordinate = frame.width - textField.layer.shadowRadius - inset - inset //Substract leading and trailing insets and shadowRadius
+        let trailingYCoordinate = frame.height - textField.layer.shadowRadius + shadowHeight
+        let midPathXCoordinate = (trailingXCoordinate - leadingXCoordinate) / 2
+        
+        let p0 = CGPoint(x: leadingXCoordinate, y: leadingYCoordinate)
+        let p1 = CGPoint(x: trailingXCoordinate, y: leadingYCoordinate)
+        let p2 = CGPoint(x: trailingXCoordinate, y: trailingYCoordinate)
+        let p3 = CGPoint(x: leadingXCoordinate, y: trailingYCoordinate)
+        let q1 = CGPoint(x: midPathXCoordinate, y: leadingYCoordinate)
         
         shadowPath.move(to: p0)
         shadowPath.addLine(to: p1)
         shadowPath.addLine(to: p2)
-             
         shadowPath.addQuadCurve(to: p3, control: q1)
         
         textField.layer.shadowPath = shadowPath

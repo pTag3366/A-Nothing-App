@@ -7,32 +7,44 @@
 
 import UIKit
 
-class NothingCollectionView: UICollectionView {
+class NothingCollectionViewTransitionLayout: UICollectionViewTransitionLayout {
     
-    static let sectionHeader = "SectionHeader"
-    static let sectionFooter = "SectionFooter"
+    override init(currentLayout: UICollectionViewLayout, nextLayout newLayout: UICollectionViewLayout) {
+        super.init(currentLayout: currentLayout, nextLayout: newLayout)
+    }
     
- 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented")
     }
     
-    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(frame: frame, collectionViewLayout: layout)
-        dataSource = self
-        delegate = self
-        register(NothingCollectionViewCell.self, 
-                 forCellWithReuseIdentifier: NothingCollectionViewCell.collectionViewCellId)
-        register(NothingCollectionViewReusableView.self,
-                 forSupplementaryViewOfKind: NothingCollectionView.sectionHeader,
-                 withReuseIdentifier: NothingCollectionView.sectionHeader)
-        register(NothingCollectionViewReusableView.self,
-                 forSupplementaryViewOfKind: NothingCollectionView.sectionFooter,
-                 withReuseIdentifier: NothingCollectionView.sectionFooter)
-        autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    
+    class func landscapeCollectionLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                              heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .fractionalHeight(0.8))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                       subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .fractionalHeight(0.1)),
+            elementKind: NothingCollectionView.sectionHeader,
+            alignment: .top)
+
+        sectionHeader.zIndex = 2
+        section.boundarySupplementaryItems = [sectionHeader]
+        
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        
+        return layout
     }
     
-    class func collectionLayout() -> UICollectionViewLayout {
+    class func portraitCollectionLayout() -> UICollectionViewLayout {
         
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .fractionalHeight(1.0))
@@ -57,6 +69,36 @@ class NothingCollectionView: UICollectionView {
         let layout = UICollectionViewCompositionalLayout(section: section)
         
         return layout
+    }
+    
+    
+    
+}
+
+class NothingCollectionView: UICollectionView {
+    
+    static let sectionHeader = "SectionHeader"
+    static let sectionFooter = "SectionFooter"
+    var isPortraitLayout: Bool = true
+    
+ 
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    
+    override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
+        super.init(frame: frame, collectionViewLayout: layout)
+        dataSource = self
+        delegate = self
+        register(NothingCollectionViewCell.self, 
+                 forCellWithReuseIdentifier: NothingCollectionViewCell.collectionViewCellId)
+        register(NothingCollectionViewReusableView.self,
+                 forSupplementaryViewOfKind: NothingCollectionView.sectionHeader,
+                 withReuseIdentifier: NothingCollectionView.sectionHeader)
+        register(NothingCollectionViewReusableView.self,
+                 forSupplementaryViewOfKind: NothingCollectionView.sectionFooter,
+                 withReuseIdentifier: NothingCollectionView.sectionFooter)
+        autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
 }
@@ -94,8 +136,32 @@ extension NothingCollectionView: UICollectionViewDataSource {
 
 extension NothingCollectionView: UICollectionViewDelegate {
     
+    func collectionView(_ collectionView: UICollectionView, transitionLayoutForOldLayout fromLayout: UICollectionViewLayout, newLayout toLayout: UICollectionViewLayout) -> UICollectionViewTransitionLayout {
+        
+        return NothingCollectionViewTransitionLayout(currentLayout: fromLayout, nextLayout: toLayout)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.collectionViewCellId, for: indexPath)
         print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
+        if (!collectionView.hasAmbiguousLayout && isPortraitLayout) {
+            collectionView.collectionViewLayout = NothingCollectionViewTransitionLayout.landscapeCollectionLayout()
+            isPortraitLayout = false
+            
+        } else if (!collectionView.hasAmbiguousLayout && !isPortraitLayout) {
+            collectionView.collectionViewLayout = NothingCollectionViewTransitionLayout.portraitCollectionLayout()
+            isPortraitLayout = true
+        }
+        if let nothingCell = cell as? NothingCollectionViewCell {
+//            nothingCell.textField.setNeedsDisplay(nothingCell.bounds)
+            nothingCell.setNeedsLayout()
+        }
+    }
+    
+    override func startInteractiveTransition(to layout: UICollectionViewLayout, completion: UICollectionView.LayoutInteractiveTransitionCompletion? = nil) -> UICollectionViewTransitionLayout {
+        print("layout transition started")
+        let layout = NothingCollectionViewTransitionLayout(currentLayout: NothingCollectionViewTransitionLayout.portraitCollectionLayout(), nextLayout: NothingCollectionViewTransitionLayout.landscapeCollectionLayout())
+        
+        return layout
     }
 }

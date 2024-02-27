@@ -16,7 +16,7 @@ class NothingViewController: UIViewController {
         super.viewDidLoad()
         print("viewDidLoad")
         collectionView = NothingCollectionView(frame: view.bounds,
-                                               collectionViewLayout: NothingCollectionView.collectionLayout())
+                                               collectionViewLayout: NothingCollectionViewTransitionLayout.portraitCollectionLayout())
         container = UIViewController()
         
         container.view.backgroundColor = .cyan

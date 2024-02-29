@@ -32,7 +32,6 @@ class NothingCollectionViewCell: UICollectionViewCell {
     }
     
     func configure() {
-        stackView.frame = frame
         addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         let inset = CGFloat(10)
@@ -40,18 +39,20 @@ class NothingCollectionViewCell: UICollectionViewCell {
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -inset),
             stackView.topAnchor.constraint(equalTo: topAnchor, constant: inset),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset)
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: inset)
         ])
         stackView.addArrangedSubview(textView)
         stackView.alignment = .top
         
         textView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            textView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: inset),
+            textView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 0),
             textView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -inset),
             textView.topAnchor.constraint(equalTo: stackView.topAnchor, constant: inset),
-            textView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 0)
+            textView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: -100)
         ])
         
+        textView.layer.borderWidth = 1.0
+        textView.layer.borderColor = CGColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
     }
 }

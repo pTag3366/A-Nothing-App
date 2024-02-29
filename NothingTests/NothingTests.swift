@@ -6,7 +6,6 @@
 //
 
 import XCTest
-@testable import Nothing
 
 final class NothingTests: XCTestCase {
 

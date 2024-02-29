@@ -15,12 +15,11 @@ class NothingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print("viewDidLoad")
+        
         collectionView = NothingCollectionView(frame: view.bounds,
-                                               collectionViewLayout: NothingCollectionViewTransitionLayout.portraitCollectionLayout())
+                                               collectionViewLayout: NothingCollectionViewLayout.portraitCollectionLayout())
         container = UIViewController()
-        
         container.view.backgroundColor = .cyan
-        
         container.view.addSubview(collectionView)
         
         addChild(container)
@@ -34,8 +33,7 @@ class NothingViewController: UIViewController {
     }
     
     override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        
+        super.viewWillLayoutSubviews() // A place to handle device orientation changes
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -47,9 +45,6 @@ class NothingViewController: UIViewController {
 //            self.removeFromParent()
 //            
 //        }
-//        collectionView.setNeedsDisplay()
-//        print("viewDidAppear")
-//        print("CollectionViewCell bounds: ", collectionView.visibleCells[0].contentView.bounds)
     }
 }
 

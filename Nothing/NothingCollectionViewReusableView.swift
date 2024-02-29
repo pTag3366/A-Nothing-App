@@ -11,6 +11,9 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
     
     let label = UILabel()
     
+    static let sectionHeader = "SectionHeader"
+    static let sectionFooter = "SectionFooter"
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         

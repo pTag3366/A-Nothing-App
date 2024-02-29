@@ -7,80 +7,9 @@
 
 import UIKit
 
-class NothingCollectionViewTransitionLayout: UICollectionViewTransitionLayout {
-    
-    override init(currentLayout: UICollectionViewLayout, nextLayout newLayout: UICollectionViewLayout) {
-        super.init(currentLayout: currentLayout, nextLayout: newLayout)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    
-    class func landscapeCollectionLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .fractionalHeight(1.0))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.8))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
-                                                       subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.1)),
-            elementKind: NothingCollectionView.sectionHeader,
-            alignment: .top)
-
-        sectionHeader.zIndex = 2
-        section.boundarySupplementaryItems = [sectionHeader]
-        
-        let layout = UICollectionViewCompositionalLayout(section: section)
-        
-        return layout
-    }
-    
-    class func portraitCollectionLayout() -> UICollectionViewLayout {
-        
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                              heightDimension: .fractionalHeight(1.0))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.4))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
-                                                       subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalHeight(0.1)),
-            elementKind: NothingCollectionView.sectionHeader,
-            alignment: .top)
-
-        sectionHeader.zIndex = 2
-        section.boundarySupplementaryItems = [sectionHeader]
-        
-        let layout = UICollectionViewCompositionalLayout(section: section)
-        
-        return layout
-    }
-    
-    
-    
-}
-
 class NothingCollectionView: UICollectionView {
     
-    static let sectionHeader = "SectionHeader"
-    static let sectionFooter = "SectionFooter"
     var isPortraitLayout: Bool = true
-    
  
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -88,17 +17,19 @@ class NothingCollectionView: UICollectionView {
     
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
+        
         dataSource = self
         delegate = self
-        register(NothingCollectionViewCell.self, 
-                 forCellWithReuseIdentifier: NothingCollectionViewCell.collectionViewCellId)
+        register(NothingCollectionViewCell.self,
+                 forCellWithReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId)
         register(NothingCollectionViewReusableView.self,
-                 forSupplementaryViewOfKind: NothingCollectionView.sectionHeader,
-                 withReuseIdentifier: NothingCollectionView.sectionHeader)
+                 forSupplementaryViewOfKind: NothingCollectionViewReusableView.sectionHeader,
+                 withReuseIdentifier: NothingCollectionViewReusableView.sectionHeader)
         register(NothingCollectionViewReusableView.self,
-                 forSupplementaryViewOfKind: NothingCollectionView.sectionFooter,
-                 withReuseIdentifier: NothingCollectionView.sectionFooter)
+                 forSupplementaryViewOfKind: NothingCollectionViewReusableView.sectionFooter,
+                 withReuseIdentifier: NothingCollectionViewReusableView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        accessibilityLabel = "NothingCollectionView"
     }
     
 }
@@ -106,11 +37,11 @@ class NothingCollectionView: UICollectionView {
 extension NothingCollectionView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(ofKind: NothingCollectionView.sectionHeader, 
-                                                                                      withReuseIdentifier: NothingCollectionView.sectionHeader,
+        guard let supplementaryView = collectionView.dequeueReusableSupplementaryView(ofKind: NothingCollectionViewReusableView.sectionHeader,
+                                                                                      withReuseIdentifier: NothingCollectionViewReusableView.sectionHeader,
                                                                                       for: indexPath) as? NothingCollectionViewReusableView
         else { return UICollectionReusableView() }
-        supplementaryView.label.text = NothingCollectionView.sectionHeader
+        supplementaryView.label.text = NothingCollectionViewReusableView.sectionHeader
         
         return supplementaryView
     }
@@ -124,11 +55,15 @@ extension NothingCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.collectionViewCellId, for: indexPath) as? NothingCollectionViewCell
-        else { return UICollectionViewCell() }
-        cell.textField.placeholder = indexPath.row.description + indexPath.section.description
-        
-        return cell
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
+        {
+            cell.textView.text = indexPath.row.description + indexPath.section.description
+            cell.accessibilityLabel = (cell.accessibilityLabel ?? "") + indexPath.row.description + indexPath.section.description
+            return cell
+        }
+        else {
+            return UICollectionViewCell()
+        }
     }
     
     
@@ -136,32 +71,16 @@ extension NothingCollectionView: UICollectionViewDataSource {
 
 extension NothingCollectionView: UICollectionViewDelegate {
     
-    func collectionView(_ collectionView: UICollectionView, transitionLayoutForOldLayout fromLayout: UICollectionViewLayout, newLayout toLayout: UICollectionViewLayout) -> UICollectionViewTransitionLayout {
-        
-        return NothingCollectionViewTransitionLayout(currentLayout: fromLayout, nextLayout: toLayout)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.collectionViewCellId, for: indexPath)
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
         print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
         if (!collectionView.hasAmbiguousLayout && isPortraitLayout) {
-            collectionView.collectionViewLayout = NothingCollectionViewTransitionLayout.landscapeCollectionLayout()
+            collectionView.collectionViewLayout = NothingCollectionViewLayout.landscapeCollectionLayout()
             isPortraitLayout = false
-            
         } else if (!collectionView.hasAmbiguousLayout && !isPortraitLayout) {
-            collectionView.collectionViewLayout = NothingCollectionViewTransitionLayout.portraitCollectionLayout()
+            collectionView.collectionViewLayout = NothingCollectionViewLayout.portraitCollectionLayout()
             isPortraitLayout = true
         }
-        if let nothingCell = cell as? NothingCollectionViewCell {
-//            nothingCell.textField.setNeedsDisplay(nothingCell.bounds)
-            nothingCell.setNeedsLayout()
-        }
-    }
-    
-    override func startInteractiveTransition(to layout: UICollectionViewLayout, completion: UICollectionView.LayoutInteractiveTransitionCompletion? = nil) -> UICollectionViewTransitionLayout {
-        print("layout transition started")
-        let layout = NothingCollectionViewTransitionLayout(currentLayout: NothingCollectionViewTransitionLayout.portraitCollectionLayout(), nextLayout: NothingCollectionViewTransitionLayout.landscapeCollectionLayout())
-        
-        return layout
+        cell.setNeedsDisplay() // Called to redraw the shadow layer
     }
 }

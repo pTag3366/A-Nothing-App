@@ -26,21 +26,25 @@ final class NothingUITests: XCTestCase {
         
     }
 
-    func testColectionViewPortraitLayout() throws {
+    func testColectionViewPortraitLayouts() throws {
         // UI tests must launch the application that they test.
         let app = XCUIApplication()
         app.launch()
         let portrait = CGRect(x: 0, y: 0, width: 393, height: 852)
-        let collectionViews = app.collectionViews["NothingCollectionView"]
-        let textViews = app.textViews["NothingTextView"]
+        let cellDimension = CGRect(x: 0.0, y: 144.0, width: 393.0, height: 340.6666666666667)
+        let headerViewDimension = CGRect(x: 0.0, y: 59.0, width: 393.0, height: 85.0)
+        let square = CGRect(x: 0, y: 0, width: portrait.width * 0.8, height: portrait.height * 0.36901)
+        let collectionView = app.collectionViews["NothingCollectionView"]
+        let headerView = collectionView.otherElements["NothingCollectionViewReusableView"]
         let collectionCell = app.collectionViews.cells["NothingCollectionViewCell00"] //indexPath [0, 0]
-        //x: 0.0, y: 144.0, w: 393.0, h: 340.6666666666667
+        let textView = collectionCell.textViews["NothingTextView"]
         
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         XCTAssertEqual(app.frame, portrait)
-        XCTAssertEqual(collectionViews.frame, portrait)
-        XCTAssertEqual(collectionCell.frame, portrait)
-//        XCTAssertNotNil(textViews)
+        XCTAssertEqual(collectionView.frame, portrait)
+        XCTAssertEqual(collectionCell.frame, cellDimension)
+        XCTAssertEqual(headerView.frame, headerViewDimension)
+        XCTAssertEqual(textView.frame, cellDimension)
     }
 
     

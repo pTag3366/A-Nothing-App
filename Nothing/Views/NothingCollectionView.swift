@@ -10,16 +10,16 @@ import UIKit
 class NothingCollectionView: UICollectionView {
     
     var isPortraitLayout: Bool = true
- 
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
     
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
-        
         dataSource = self
         delegate = self
+        
         register(NothingCollectionViewCell.self,
                  forCellWithReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId)
         register(NothingCollectionViewReusableView.self,
@@ -57,6 +57,7 @@ extension NothingCollectionView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
+            
             cell.textView.text = indexPath.row.description + indexPath.section.description
             cell.accessibilityLabel = (cell.accessibilityLabel ?? "") + indexPath.row.description + indexPath.section.description
             return cell
@@ -74,13 +75,13 @@ extension NothingCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
         print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
-        if (!collectionView.hasAmbiguousLayout && isPortraitLayout) {
-            collectionView.collectionViewLayout = NothingCollectionViewLayout.landscapeCollectionLayout()
-            isPortraitLayout = false
-        } else if (!collectionView.hasAmbiguousLayout && !isPortraitLayout) {
-            collectionView.collectionViewLayout = NothingCollectionViewLayout.portraitCollectionLayout()
-            isPortraitLayout = true
-        }
-        cell.setNeedsDisplay() // Called to redraw the shadow layer
+//        if (!collectionView.hasAmbiguousLayout && isPortraitLayout) {
+//            collectionView.collectionViewLayout = NothingCollectionViewLayout.landscapeCollectionLayout()
+//            isPortraitLayout = false
+//        } else if (!collectionView.hasAmbiguousLayout && !isPortraitLayout) {
+//            collectionView.collectionViewLayout = NothingCollectionViewLayout.portraitCollectionLayout(with: )
+//            isPortraitLayout = true
+//        }
+//        cell.setNeedsDisplay() // Called to redraw the shadow layer
     }
 }

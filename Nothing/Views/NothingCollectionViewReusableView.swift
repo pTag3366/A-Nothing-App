@@ -11,8 +11,8 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
     
     let label = UILabel()
     
-    static let sectionHeader = "SectionHeader"
-    static let sectionFooter = "SectionFooter"
+    static let sectionHeader = "SectionHeaderReuseId"
+    static let sectionFooter = "SectionFooterReuseId"
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -22,6 +22,7 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .blue
+        accessibilityLabel = "NothingCollectionViewReusableView"
         configure()
     }
     
@@ -29,7 +30,7 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
-        let inset = CGFloat(10)
+        let inset = CGFloat(0)
         NSLayoutConstraint.activate([
             label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
             label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -inset),

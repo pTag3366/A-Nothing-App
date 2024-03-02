@@ -36,7 +36,7 @@ class NothingStackView: UIStackView {
         let xOffset: CGFloat = -shadowHeight - shadowRadius
 
         assert(layer.frame.equalTo(frame))
-        let newRect = CGRect(x: layer.frame.origin.x, y: layer.frame.origin.y, width: layer.frame.width, height: layer.frame.height + (5 * yOffset))/*layer.frame*/
+        let newRect = CGRect(x: layer.frame.origin.x, y: layer.frame.origin.y, width: layer.frame.width, height: layer.frame.height)
         
         
         layer.backgroundColor = UIColor.clear.cgColor

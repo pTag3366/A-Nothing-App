@@ -31,9 +31,9 @@ final class NothingUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         let portrait = CGRect(x: 0, y: 0, width: 393, height: 852)
-        let cellDimension = CGRect(x: 0.0, y: 144.0, width: 393.0, height: 340.6666666666667)
+        let cellDimension = CGRect(x: 0.0, y: 144.0, width: 393.0, height: 852.0)
         let headerViewDimension = CGRect(x: 0.0, y: 59.0, width: 393.0, height: 85.0)
-        let square = CGRect(x: 0, y: 0, width: portrait.width * 0.8, height: portrait.height * 0.36901)
+        let squareFrame = CGRect(x: 39.33333333333334,y: 412.6666666666667,width: 314.33333333333337,height: 314.6666666666667)
         let collectionView = app.collectionViews["NothingCollectionView"]
         let headerView = collectionView.otherElements["NothingCollectionViewReusableView"]
         let collectionCell = app.collectionViews.cells["NothingCollectionViewCell00"] //indexPath [0, 0]
@@ -44,7 +44,7 @@ final class NothingUITests: XCTestCase {
         XCTAssertEqual(collectionView.frame, portrait)
         XCTAssertEqual(collectionCell.frame, cellDimension)
         XCTAssertEqual(headerView.frame, headerViewDimension)
-        XCTAssertEqual(textView.frame, cellDimension)
+        XCTAssertEqual(textView.frame, squareFrame)
     }
 
     

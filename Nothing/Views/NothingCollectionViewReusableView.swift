@@ -26,7 +26,7 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
         configure()
     }
     
-    func configure() {
+    private func configure() {
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true

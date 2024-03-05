@@ -31,7 +31,7 @@ class NothingStackView: UIStackView {
         drawShadowLayer(rect)
     }
     
-    func configure() {
+    private func configure() {
         backgroundColor = .clear
         contentMode = .redraw
     }

@@ -14,10 +14,9 @@ class NothingTextView: UITextView, UITextViewDelegate {
         delegate = self
         accessibilityLabel = "NothingTextView"
         configure()
-        addBeginEditGestureRecognizer()
     }
     
-    func configure() {
+    private func configure() {
         backgroundColor = .clear
         adjustsFontForContentSizeCategory = true
         font = UIFont.preferredFont(forTextStyle: .title3)
@@ -27,15 +26,10 @@ class NothingTextView: UITextView, UITextViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func beginEditGestureAction() {
-        print("Gesture recognized !")
-        becomeFirstResponder()
-        print("should now become first responder...")
-    }
-    
-    func addBeginEditGestureRecognizer() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.beginEditGestureAction))
-        addGestureRecognizer(tapGesture)
+    override func becomeFirstResponder() -> Bool {
+        
+        NotificationCenter.default.post(name: UIResponder.keyboardWillShowNotification, object: nil)
+        return super.becomeFirstResponder()
     }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
@@ -44,6 +38,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         print("textViewDidBeginEditing !")
+        
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {

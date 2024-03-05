@@ -8,8 +8,6 @@
 import UIKit
 
 class NothingCollectionView: UICollectionView {
-    
-    var isPortraitLayout: Bool = true
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -19,7 +17,6 @@ class NothingCollectionView: UICollectionView {
         super.init(frame: frame, collectionViewLayout: layout)
         dataSource = self
         delegate = self
-        
         register(NothingCollectionViewCell.self,
                  forCellWithReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId)
         register(NothingCollectionViewReusableView.self,
@@ -30,6 +27,12 @@ class NothingCollectionView: UICollectionView {
                  withReuseIdentifier: NothingCollectionViewReusableView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         accessibilityLabel = "NothingCollectionView"
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardDismissal), name: UIResponder.keyboardWillShowNotification, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
 }
@@ -75,5 +78,14 @@ extension NothingCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
         print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
+        let spaceForKeyboard = CGRect(x: cell.frame.minX, y: cell.frame.minY + (frame.height * 0.1), width: frame.width, height: frame.height)
+        scrollRectToVisible(spaceForKeyboard, animated: true)
+    }
+}
+
+extension NothingCollectionView {
+    
+    @objc func handleKeyboardDismissal() {
+        print("handleKeyboardDismissal!")
     }
 }

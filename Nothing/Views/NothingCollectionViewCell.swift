@@ -12,7 +12,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
     static let nothingCollectionViewCellId = "NothingCollectionViewCellReuseId"
     var textView: NothingTextView!
     var stackView: NothingStackView!
-    var sideLength: CGFloat {
+    private var sideLength: CGFloat {
         return frame.width < frame.height ? (frame.width * 0.8) : (frame.height * 0.8)
     }
     
@@ -20,7 +20,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         textView = NothingTextView(frame: frame)
         stackView = NothingStackView(frame: frame)
-        
+
         backgroundColor = .clear
         accessibilityLabel = "NothingCollectionViewCell"
         contentMode = .redraw // sets the view to be redrawn when invoking setNeedsDisplay()
@@ -36,7 +36,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
     }
     
-    func configure() {
+    private func configure() {
         
         addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false

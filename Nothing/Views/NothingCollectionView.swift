@@ -75,13 +75,5 @@ extension NothingCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
         print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
-//        if (!collectionView.hasAmbiguousLayout && isPortraitLayout) {
-//            collectionView.collectionViewLayout = NothingCollectionViewLayout.landscapeCollectionLayout()
-//            isPortraitLayout = false
-//        } else if (!collectionView.hasAmbiguousLayout && !isPortraitLayout) {
-//            collectionView.collectionViewLayout = NothingCollectionViewLayout.portraitCollectionLayout(with: )
-//            isPortraitLayout = true
-//        }
-//        cell.setNeedsDisplay() // Called to redraw the shadow layer
     }
 }

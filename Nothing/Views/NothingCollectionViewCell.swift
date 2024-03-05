@@ -12,12 +12,15 @@ class NothingCollectionViewCell: UICollectionViewCell {
     static let nothingCollectionViewCellId = "NothingCollectionViewCellReuseId"
     var textView: NothingTextView!
     var stackView: NothingStackView!
-    
+    var sideLength: CGFloat {
+        return frame.width < frame.height ? (frame.width * 0.8) : (frame.height * 0.8)
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         textView = NothingTextView(frame: frame)
         stackView = NothingStackView(frame: frame)
+        
         backgroundColor = .clear
         accessibilityLabel = "NothingCollectionViewCell"
         contentMode = .redraw // sets the view to be redrawn when invoking setNeedsDisplay()
@@ -34,27 +37,17 @@ class NothingCollectionViewCell: UICollectionViewCell {
     }
     
     func configure() {
-//        translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-//            trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-//            bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-//            topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
-//        ])
         
         addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        let inset = CGFloat(0)
         NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -inset),
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: inset),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: inset)
+            stackView.widthAnchor.constraint(equalToConstant: sideLength),
+            stackView.heightAnchor.constraint(equalToConstant: sideLength),
+            stackView.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor),
+            stackView.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor)
         ])
         stackView.addArrangedSubview(textView)
         stackView.alignment = .top
-//        stackView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-//        stackView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         
         let textViewInsets = CGFloat(0)
         textView.translatesAutoresizingMaskIntoConstraints = false

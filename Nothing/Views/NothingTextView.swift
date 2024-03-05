@@ -21,7 +21,6 @@ class NothingTextView: UITextView, UITextViewDelegate {
         backgroundColor = .clear
         adjustsFontForContentSizeCategory = true
         font = UIFont.preferredFont(forTextStyle: .title3)
-        
     }
     
     required init?(coder: NSCoder) {
@@ -54,7 +53,5 @@ class NothingTextView: UITextView, UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         print("textViewDidEndEditing !")
     }
-    
-    
-    
+
 }

@@ -9,10 +9,17 @@ import UIKit
 
 class NothingStackView: UIStackView {
     
+    var dx: CGFloat {
+        return frame.minX
+    }
+    
+    var dy: CGFloat {
+        return frame.height
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
-        contentMode = .redraw
+
         configure()
     }
     
@@ -25,29 +32,31 @@ class NothingStackView: UIStackView {
     }
     
     func configure() {
-        
+        backgroundColor = .clear
+        contentMode = .redraw
     }
     
     func drawShadowLayer(_ rect: CGRect) {
+        let offset: CGRect = rect.offsetBy(dx: 0, dy: dy)
+
         let shadowPath = CGMutablePath()
         let shadowHeight: CGFloat = 20
-        let shadowRadius: CGFloat = 1
+        let shadowRadius: CGFloat = 5
         let yOffset: CGFloat = -shadowHeight - shadowRadius
         let xOffset: CGFloat = -shadowHeight - shadowRadius
 
         assert(layer.frame.equalTo(frame))
-        let newRect = CGRect(x: layer.frame.origin.x, y: layer.frame.origin.y, width: layer.frame.width, height: layer.frame.height)
-        
+        let newRect = offset
         
         layer.backgroundColor = UIColor.clear.cgColor
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowRadius = shadowRadius
         layer.shadowOpacity = 1
         
-        shadowPath.move(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.maxY))
-        shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.maxY))
-        shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.maxY + shadowHeight))
-        shadowPath.addQuadCurve(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.maxY + shadowHeight), control: CGPoint(x: newRect.midX, y: newRect.maxY))
+        shadowPath.move(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.minY + abs(yOffset)))
+        shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.minY + abs(yOffset)))
+        shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.minY + abs(yOffset) + shadowHeight))
+        shadowPath.addQuadCurve(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.minY + abs(yOffset) + shadowHeight), control: CGPoint(x: newRect.midX, y: newRect.minY + abs(yOffset)))
         
         layer.shadowPath = shadowPath
     }

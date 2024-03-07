@@ -8,6 +8,15 @@
 import UIKit
 
 class NothingCollectionView: UICollectionView {
+    
+//    var notificationCenter: NothingNotificationManager!
+    let textViewdWillResign = Notification.Name("textViewWillResign")
+    var spaceForKeyboard: CGRect {
+//        CGRect(x: frame.minX, y: frame.minY + (frame.height * 0.1), width: frame.width, height: frame.height)
+        frame.offsetBy(dx: 0, dy: frame.height / 2)
+    }
+    
+    var keyboardChangeObserver: NSObjectProtocol!
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -27,8 +36,35 @@ class NothingCollectionView: UICollectionView {
                  withReuseIdentifier: NothingCollectionViewReusableView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         accessibilityLabel = "NothingCollectionView"
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardDismissal), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.textViewWillResign(_:)), name: textViewdWillResign, object: nil)
+//        notificationCenter.addKeyboardEventsObserver(self)
+//        let notificationCenter = NotificationCenter.default
+//        let mainQueue = OperationQueue.main
+//        keyboardChangeObserver = notificationCenter.addObserver(
+//            forName: UIResponder.keyboardDidShowNotification,
+//            object: nil,
+//            queue: mainQueue) { (notification) in
+//                guard let userInfo = notification.userInfo else { return }
+//
+//                print(userInfo)
+//
+//                // In iOS 16.1 and later, the keyboard notification object is the screen the keyboard appears on.
+//                guard let screen = notification.object as? UIScreen,
+//                      // Get the keyboard’s frame at the end of its animation.
+//                      let keyboardFrameEnd = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+//
+//
+//                // Use that screen to get the coordinate space to convert from.
+//                let fromCoordinateSpace = screen.coordinateSpace
+//            }
+//        let center = NotificationCenter.default
+//        guard let keyboardChangeObserver = self.keyboardChangeObserver else { return }
+//        notificationCenter.removeObserver(keyboardChangeObserver)
+//        let notificationCenterObject = NotificationCenter()
+//        notificationCenter = NothingNotificationManager(notificationCenter: notificationCenterObject)
+//        notificationCenter = NothingNotificationManager()
+//        notificationCenter.addKeyboardEventsObserver(self)
     }
     
     deinit {
@@ -60,9 +96,9 @@ extension NothingCollectionView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
-            
-            cell.textView.text = indexPath.row.description + indexPath.section.description
-            cell.accessibilityLabel = (cell.accessibilityLabel ?? "") + indexPath.row.description + indexPath.section.description
+            let placeholder = indexPath.row.description + indexPath.section.description
+            cell.textView.setPlaceholderText(with: placeholder)
+            cell.setAccessibilityLabel(with: placeholder)
             return cell
         }
         else {
@@ -77,15 +113,45 @@ extension NothingCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
+//        _ = cell.textView.resignFirstResponder()
+        //textDidEndEditingNotification
+        //textDidEndEditingNotification
+        NotificationCenter.default.post(name: textViewdWillResign, object: nil, userInfo: nil)
         print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
-        let spaceForKeyboard = CGRect(x: cell.frame.minX, y: cell.frame.minY + (frame.height * 0.1), width: frame.width, height: frame.height)
-        scrollRectToVisible(spaceForKeyboard, animated: true)
+//        scrollRectToVisible(spaceForKeyboard, animated: true)
     }
 }
 
 extension NothingCollectionView {
     
-    @objc func handleKeyboardDismissal() {
-        print("handleKeyboardDismissal!")
+    @objc func textViewWillResign(_ notification: Notification) {
+        print("textViewWillResign")
+        endEditing(true)
+    }
+    
+    @objc func willDisplayKeyboard(_ notification: Notification) {
+        let userInfo = notification.userInfo
+        print(userInfo as Any)
+//        scrollRectToVisible(spaceForKeyboard, animated: true)
+        
+//        print(keyboardLayoutGuide.owningView?.center)
+        print("willDisplayKeyboard!")
+    }
+    
+    @objc func didShowKeyboard(_ notification: Notification) {
+        let userInfo = notification.userInfo
+        print(userInfo as Any)
+        
+        print("didShowKeyboard!")
+//        notificationCenter.removeObserverObjects()
+    }
+    
+    @objc func willHideKeyboard(_ notification: Notification) {
+//        print(keyboardLayoutGuide.owningView?.center)
+        print("willHideKeyboard")
+    }
+    
+    @objc func didHideKeyboard(_ notification: Notification) {
+        print("didHideKeyboard")
     }
 }

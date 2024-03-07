@@ -36,6 +36,10 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
     }
     
+    func setAccessibilityLabel(with string: String) {
+        accessibilityLabel = (accessibilityLabel ?? "") + string
+    }
+    
     private func configure() {
         
         addSubview(stackView)

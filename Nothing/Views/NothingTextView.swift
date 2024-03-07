@@ -9,11 +9,36 @@ import UIKit
 
 class NothingTextView: UITextView, UITextViewDelegate {
     
+//    let notificationManager = NothingNotificationManager()
+//    var keyboardChangeObserver: NSObjectProtocol?
+    
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         delegate = self
         accessibilityLabel = "NothingTextView"
         configure()
+        
+        
+        //A one time only notification
+//        let center = NotificationCenter.default
+//        let mainQueue = OperationQueue.main
+//        token = center.addObserver(
+//            forName: NSNotification.Name("OneTimeNotification"),
+//            object: nil,
+//            queue: mainQueue) {[weak self] (note) in
+//                print("Received the notification!")
+//                guard let token = self?.token else { return }
+//                center.removeObserver(token)
+//        }
+//        notificationManager.addKeyboardEventsObserver(self)
+    }
+    
+    deinit {
+        
+    }
+    
+    @objc func handleKeyboardDidShow() {
+        print("keyboardNotificationDidShow")
     }
     
     private func configure() {
@@ -26,11 +51,19 @@ class NothingTextView: UITextView, UITextViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func becomeFirstResponder() -> Bool {
-        
-        NotificationCenter.default.post(name: UIResponder.keyboardWillShowNotification, object: nil)
-        return super.becomeFirstResponder()
+    func setPlaceholderText(with string: String) {
+        text = string
     }
+    
+//    override func becomeFirstResponder() -> Bool {
+//        
+//        return super.becomeFirstResponder()
+//    }
+//    
+//    override func resignFirstResponder() -> Bool {
+//        
+//        return super.resignFirstResponder()
+//    }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         return true
@@ -50,3 +83,18 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
 
 }
+
+//extension NothingCollectionView {
+//    
+//    @objc func willDisplayKeyboard() {
+////        scrollRectToVisible(spaceForKeyboard, animated: true)
+//        
+////        print(keyboardLayoutGuide.owningView?.center)
+//        print("willDisplayKeyboard!")
+//    }
+//    
+//    @objc func willHideKeyboard() {
+////        print(keyboardLayoutGuide.owningView?.center)
+//        print("willHideKeyboard")
+//    }
+//}

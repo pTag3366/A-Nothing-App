@@ -9,10 +9,6 @@ import UIKit
 
 class NothingStackView: UIStackView {
     
-    var dx: CGFloat {
-        return frame.minX
-    }
-    
     var dy: CGFloat {
         return frame.height
     }

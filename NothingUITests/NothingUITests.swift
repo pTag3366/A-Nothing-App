@@ -36,7 +36,7 @@ final class NothingUITests: XCTestCase {
         let squareFrame = CGRect(x: 39.33333333333334,y: 412.6666666666667,width: 314.33333333333337,height: 314.6666666666667)
         let collectionView = app.collectionViews["NothingCollectionView"]
         let headerView = collectionView.otherElements["NothingCollectionViewReusableView"]
-        let collectionCell = app.collectionViews.cells["NothingCollectionViewCell00"] //indexPath [0, 0]
+        let collectionCell = app.collectionViews.cells["NothingCollectionViewCell,0,0"] //indexPath [0, 0]
         let textView = collectionCell.textViews["NothingTextView"]
         
         // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -47,14 +47,19 @@ final class NothingUITests: XCTestCase {
         XCTAssertEqual(textView.frame, squareFrame)
     }
     
+    func testScrollToFocusSelectedTextView() {
+        let app = XCUIApplication()
+        app.launch()
+//        let cellRect = CGRect(x: 0.0, y: 144.0, width: 393.0, height: 852.0)
+        let collectionCell = app.collectionViews.cells["NothingCollectionViewCell,0,0"] //indexPath [0, 0]
+        let textView = collectionCell.textViews["NothingTextView"]
+        textView.tap()
+        RunLoop.main.run(until: .now + 1.0)
+        collectionCell.tap()
+    }
+    
     func testKeyboardDismissalOnTextViewBecomesFirstResponder() {
-//        [AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25, AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 852}, {393, 336}}, AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {393, 336}}, AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {196.5, 684}, AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7, AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {196.5, 1020}, AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1, AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 516}, {393, 336}}]
         
-//        [AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1, AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7, AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25, AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 393}, {852, 219}}, AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {426, 283.5}, AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {426, 502.5}, AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {852, 219}}, AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 174}, {852, 219}}]
-        
-//        [AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 1180}, {820, 337}}, AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1, AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {410, 1011.5}, AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {820, 337}}, AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7, AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 843}, {820, 337}}, AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {410, 1348.5}, AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0.25]
-        
-//        [AnyHashable("UIKeyboardAnimationDurationUserInfoKey"): 0, AnyHashable("UIKeyboardFrameEndUserInfoKey"): NSRect: {{0, 398}, {1180, 422}}, AnyHashable("UIKeyboardBoundsUserInfoKey"): NSRect: {{0, 0}, {1180, 422}}, AnyHashable("UIKeyboardCenterEndUserInfoKey"): NSPoint: {590, 609}, AnyHashable("UIKeyboardFrameBeginUserInfoKey"): NSRect: {{0, 820}, {1180, 422}}, AnyHashable("UIKeyboardAnimationCurveUserInfoKey"): 7, AnyHashable("UIKeyboardIsLocalUserInfoKey"): 1, AnyHashable("UIKeyboardCenterBeginUserInfoKey"): NSPoint: {590, 1031}]
     }
 
     

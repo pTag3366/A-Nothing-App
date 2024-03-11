@@ -9,14 +9,8 @@ import UIKit
 
 class NothingCollectionView: UICollectionView {
     
-//    var notificationCenter: NothingNotificationManager!
-    let textViewdWillResign = Notification.Name("textViewWillResign")
-    var spaceForKeyboard: CGRect {
-//        CGRect(x: frame.minX, y: frame.minY + (frame.height * 0.1), width: frame.width, height: frame.height)
-        frame.offsetBy(dx: 0, dy: frame.height / 2)
-    }
-    
-    var keyboardChangeObserver: NSObjectProtocol!
+    let textViewWillResignFirstResponder = Notification.Name("textViewWillResign")
+    var totalNumberOfItems: Int = 0
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -36,40 +30,16 @@ class NothingCollectionView: UICollectionView {
                  withReuseIdentifier: NothingCollectionViewReusableView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         accessibilityLabel = "NothingCollectionView"
+//        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.willDisplayKeyboard(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.textViewWillResign(_:)), name: textViewdWillResign, object: nil)
-//        notificationCenter.addKeyboardEventsObserver(self)
-//        let notificationCenter = NotificationCenter.default
-//        let mainQueue = OperationQueue.main
-//        keyboardChangeObserver = notificationCenter.addObserver(
-//            forName: UIResponder.keyboardDidShowNotification,
-//            object: nil,
-//            queue: mainQueue) { (notification) in
-//                guard let userInfo = notification.userInfo else { return }
-//
-//                print(userInfo)
-//
-//                // In iOS 16.1 and later, the keyboard notification object is the screen the keyboard appears on.
-//                guard let screen = notification.object as? UIScreen,
-//                      // Get the keyboard’s frame at the end of its animation.
-//                      let keyboardFrameEnd = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-//
-//
-//                // Use that screen to get the coordinate space to convert from.
-//                let fromCoordinateSpace = screen.coordinateSpace
-//            }
-//        let center = NotificationCenter.default
-//        guard let keyboardChangeObserver = self.keyboardChangeObserver else { return }
-//        notificationCenter.removeObserver(keyboardChangeObserver)
-//        let notificationCenterObject = NotificationCenter()
-//        notificationCenter = NothingNotificationManager(notificationCenter: notificationCenterObject)
-//        notificationCenter = NothingNotificationManager()
-//        notificationCenter.addKeyboardEventsObserver(self)
+        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.textViewWillResign(_:)), name: textViewWillResignFirstResponder, object: nil)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
+    
     
 }
 
@@ -86,17 +56,20 @@ extension NothingCollectionView: UICollectionViewDataSource {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 10
+        return 10/*Int.random(in: 0...10)*/
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        let itemsInSection = Int.random(in: 0...10)
+        totalNumberOfItems += itemsInSection
+        return 10/*itemsInSection*/
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
-            let placeholder = indexPath.row.description + indexPath.section.description
+            
+            let placeholder = indexPath.commaSeparatedStringRepresentation
             cell.textView.setPlaceholderText(with: placeholder)
             cell.setAccessibilityLabel(with: placeholder)
             return cell
@@ -113,45 +86,136 @@ extension NothingCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
-//        _ = cell.textView.resignFirstResponder()
-        //textDidEndEditingNotification
-        //textDidEndEditingNotification
-        NotificationCenter.default.post(name: textViewdWillResign, object: nil, userInfo: nil)
-        print(cell.reuseIdentifier!, indexPath.row, indexPath.section)
-//        scrollRectToVisible(spaceForKeyboard, animated: true)
+
+        NotificationCenter.default.post(name: textViewWillResignFirstResponder, object: nil, userInfo: nil)
+//        scrollRectToVisible(self.bounds, animated: true)
+//        print(cell.frame)
+//        print(totalNumberOfItems)
+
     }
 }
 
 extension NothingCollectionView {
-    
     @objc func textViewWillResign(_ notification: Notification) {
         print("textViewWillResign")
         endEditing(true)
     }
     
     @objc func willDisplayKeyboard(_ notification: Notification) {
-        let userInfo = notification.userInfo
-        print(userInfo as Any)
-//        scrollRectToVisible(spaceForKeyboard, animated: true)
-        
-//        print(keyboardLayoutGuide.owningView?.center)
-        print("willDisplayKeyboard!")
+//        let userInfo = notification.userInfo
+//        print(userInfo as Any)
     }
     
     @objc func didShowKeyboard(_ notification: Notification) {
-        let userInfo = notification.userInfo
-        print(userInfo as Any)
+        guard let userInfo = notification.userInfo else { return }
+
+
+        // In iOS 16.1 and later, the keyboard notification object is the screen the keyboard appears on.
+        guard let screen = notification.object as? UIScreen,
+              // Get the keyboard’s frame at the end of its animation.
+              let keyboardFrameEnd = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
-        print("didShowKeyboard!")
-//        notificationCenter.removeObserverObjects()
+        // Use that screen to get the coordinate space to convert from.
+        let fromCoordinateSpace = screen.coordinateSpace
+
+
+        // Get your view's coordinate space.
+        let toCoordinateSpace: UICoordinateSpace = super.coordinateSpace
+
+
+        // Convert the keyboard's frame from the screen's coordinate space to your view's coordinate space.
+        let convertedKeyboardFrameEnd = fromCoordinateSpace.convert(keyboardFrameEnd, to: toCoordinateSpace)
+        
+        // Get the safe area insets when the keyboard is offscreen.
+        var bottomOffset = self.safeAreaInsets.bottom
+            
+        // Get the intersection between the keyboard's frame and the view's bounds to work with the
+        // part of the keyboard that overlaps your view.
+        let viewIntersection = self.bounds.intersection(convertedKeyboardFrameEnd)
+            
+        // Check whether the keyboard intersects your view before adjusting your offset.
+        if !viewIntersection.isEmpty {
+                
+            // Adjust the offset by the difference between the view's height and the height of the
+            // intersection rectangle.
+            bottomOffset = self.bounds.maxY - viewIntersection.minY
+        }
+        
+        let currentFrame = CGRect(x: 0, y: self.bounds.maxY - self.bounds.height, width: self.bounds.width, height: self.frame.height)
+        let fullCellHeigthFromMaxYBounds = currentFrame.minY + self.bounds.height
+        var distance = self.bounds.height - fullCellHeigthFromMaxYBounds
+//        visibleCells.forEach {
+//            let intersection = $0.frame.intersection(currentFrame)
+//            print(intersection)
+//        }
+        let allVisibleCells = returnAllSubviews(type: NothingCollectionViewCell.self)
+//        self.subviews.forEach {
+//            print($0.self, $0.frame.intersects(currentFrame), $0.frame.intersection(currentFrame))
+//        }
+        var intersects = [CGRect]()
+        allVisibleCells.forEach {
+            if ($0.frame.intersects(currentFrame) == true) {
+                intersects.append($0.frame)
+            }
+//            print($0.self, $0.frame.intersects(currentFrame), $0.frame.intersection(currentFrame))
+        }
+        
+        let focusRect = intersects.max(by: { a, b in a.size > b.size }) ?? .zero/*visibleCells.map { $0.frame.intersection(self.bounds) }.max(by: { a, b in a.height > b.height }) ?? .zero*/
+        distance = distance + focusRect.origin.y
+        
+        scrollRectToVisible(currentFrame.offsetBy(dx: 0, dy: distance), animated: true)
+        
+        // Use the new offset to adjust your UI, for example by changing a layout guide, offsetting
+        // your view, changing a scroll inset, and so on. This example uses the new offset to update
+        // the value of an existing Auto Layout constraint on the view.
+//        movingBottomConstraint.constant = bottomOffset
     }
     
     @objc func willHideKeyboard(_ notification: Notification) {
-//        print(keyboardLayoutGuide.owningView?.center)
-        print("willHideKeyboard")
+
     }
     
     @objc func didHideKeyboard(_ notification: Notification) {
-        print("didHideKeyboard")
+
     }
+    
+    private func adjustForKeyboard(_ rect: CGRect) {
+        
+    }
+}
+
+extension UICollectionView {
+    
+    var maxVisibleMinY: CGFloat {
+        return visibleCells.map { $0.frame.minY }.max() ?? 0.0
+    }
+    
+}
+
+extension UIView {
+    func returnAllSubviews<T: UIView>(type: T.Type) -> [T] {
+        // base case: I am a UILabel
+        // return myself
+        var subLabels: [T] = []
+        if let label = self as? T {
+            subLabels.append(label)
+        }
+        // I have subviews, go check if any of those are labels
+        for view in self.subviews {
+            let labels = view.returnAllSubviews(type: T.self)
+            subLabels.append(contentsOf: labels)
+        }
+        return subLabels
+    }
+}
+
+extension CGSize: Comparable {
+    public static func < (lhs: CGSize, rhs: CGSize) -> Bool {
+        (lhs.width * lhs.height) < (rhs.width * rhs.height)
+    }
+    
+    public static func > (lhs: CGSize, rhs: CGSize) -> Bool {
+        (lhs.width * lhs.height) > (rhs.width * rhs.height)
+    }
+    
 }

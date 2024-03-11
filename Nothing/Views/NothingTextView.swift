@@ -9,28 +9,12 @@ import UIKit
 
 class NothingTextView: UITextView, UITextViewDelegate {
     
-//    let notificationManager = NothingNotificationManager()
-//    var keyboardChangeObserver: NSObjectProtocol?
-    
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         delegate = self
         accessibilityLabel = "NothingTextView"
         configure()
         
-        
-        //A one time only notification
-//        let center = NotificationCenter.default
-//        let mainQueue = OperationQueue.main
-//        token = center.addObserver(
-//            forName: NSNotification.Name("OneTimeNotification"),
-//            object: nil,
-//            queue: mainQueue) {[weak self] (note) in
-//                print("Received the notification!")
-//                guard let token = self?.token else { return }
-//                center.removeObserver(token)
-//        }
-//        notificationManager.addKeyboardEventsObserver(self)
     }
     
     deinit {
@@ -38,7 +22,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     @objc func handleKeyboardDidShow() {
-        print("keyboardNotificationDidShow")
+//        print("keyboardNotificationDidShow")
     }
     
     private func configure() {
@@ -52,26 +36,15 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func setPlaceholderText(with string: String) {
-        text = string
+        text = string.components(separatedBy: ",").joined()
     }
-    
-//    override func becomeFirstResponder() -> Bool {
-//        
-//        return super.becomeFirstResponder()
-//    }
-//    
-//    override func resignFirstResponder() -> Bool {
-//        
-//        return super.resignFirstResponder()
-//    }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         return true
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        print("textViewDidBeginEditing !")
-        
+//        print("textViewDidBeginEditing !")
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
@@ -79,22 +52,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        print("textViewDidEndEditing !")
+//        print("textViewDidEndEditing !")
     }
 
 }
-
-//extension NothingCollectionView {
-//    
-//    @objc func willDisplayKeyboard() {
-////        scrollRectToVisible(spaceForKeyboard, animated: true)
-//        
-////        print(keyboardLayoutGuide.owningView?.center)
-//        print("willDisplayKeyboard!")
-//    }
-//    
-//    @objc func willHideKeyboard() {
-////        print(keyboardLayoutGuide.owningView?.center)
-//        print("willHideKeyboard")
-//    }
-//}

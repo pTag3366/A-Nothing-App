@@ -39,7 +39,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
     }
     
     func setAccessibilityLabel(with string: String) {
-        accessibilityLabel = (accessibilityLabel ?? "") + string
+        accessibilityLabel = "NothingCollectionViewCell" + string
     }
     
     private func configure() {

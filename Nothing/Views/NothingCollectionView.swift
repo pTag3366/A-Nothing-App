@@ -79,7 +79,6 @@ extension NothingCollectionView: UICollectionViewDataSource {
         }
     }
     
-    
 }
 
 extension NothingCollectionView: UICollectionViewDelegate {
@@ -115,60 +114,36 @@ extension NothingCollectionView {
               // Get the keyboard’s frame at the end of its animation.
               let keyboardFrameEnd = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
+        let currentFrame = CGRect(x: 0, y: self.bounds.maxY - self.bounds.height, width: self.bounds.width, height: self.frame.height)
+        
         // Use that screen to get the coordinate space to convert from.
         let fromCoordinateSpace = screen.coordinateSpace
 
-
+        
+        let cellAtCenterIndexPath = indexPathForItem(at: CGPoint(x: self.bounds.midX, y: self.bounds.midY))
+        let visibleCellOnScreen = visibleCells.first(where:  {
+            let nothingCell = $0 as! NothingCollectionViewCell
+            return nothingCell.indexPathFromAccessibilityLabel == cellAtCenterIndexPath
+        }) as! NothingCollectionViewCell
         // Get your view's coordinate space.
-        let toCoordinateSpace: UICoordinateSpace = super.coordinateSpace
+//        let toCoordinateSpace: UICoordinateSpace = view
 
 
         // Convert the keyboard's frame from the screen's coordinate space to your view's coordinate space.
-        let convertedKeyboardFrameEnd = fromCoordinateSpace.convert(keyboardFrameEnd, to: toCoordinateSpace)
+//        let convertedKeyboardFrameEnd = fromCoordinateSpace.convert(keyboardFrameEnd, to: toCoordinateSpace)
         
-        // Get the safe area insets when the keyboard is offscreen.
-        var bottomOffset = self.safeAreaInsets.bottom
-            
-        // Get the intersection between the keyboard's frame and the view's bounds to work with the
-        // part of the keyboard that overlaps your view.
-        let viewIntersection = self.bounds.intersection(convertedKeyboardFrameEnd)
-            
-        // Check whether the keyboard intersects your view before adjusting your offset.
-        if !viewIntersection.isEmpty {
+        
+//        let offset = allVisibleIndexPaths.map({ expectedOffset(at: $0) })
+//
+//        var intersects: [CGRect] = [CGRect]()
+//        intersects = allVisibleCells.map { $0.intersection(currentFrame) }
+//        
+//        let minIntersect = intersects.map({ $0.height }).min() ?? 0.0
+//        let scrollValue = self.bounds.minY - minIntersect
+        
+//        distance = self.bounds.height - maxIntersect
                 
-            // Adjust the offset by the difference between the view's height and the height of the
-            // intersection rectangle.
-            bottomOffset = self.bounds.maxY - viewIntersection.minY
-        }
-        
-        let currentFrame = CGRect(x: 0, y: self.bounds.maxY - self.bounds.height, width: self.bounds.width, height: self.frame.height)
-        let fullCellHeigthFromMaxYBounds = currentFrame.minY + self.bounds.height
-        var distance = self.bounds.height - fullCellHeigthFromMaxYBounds
-//        visibleCells.forEach {
-//            let intersection = $0.frame.intersection(currentFrame)
-//            print(intersection)
-//        }
-        let allVisibleCells = returnAllSubviews(type: NothingCollectionViewCell.self)
-//        self.subviews.forEach {
-//            print($0.self, $0.frame.intersects(currentFrame), $0.frame.intersection(currentFrame))
-//        }
-        var intersects = [CGRect]()
-        allVisibleCells.forEach {
-            if ($0.frame.intersects(currentFrame) == true) {
-                intersects.append($0.frame)
-            }
-//            print($0.self, $0.frame.intersects(currentFrame), $0.frame.intersection(currentFrame))
-        }
-        
-        let focusRect = intersects.max(by: { a, b in a.size > b.size }) ?? .zero/*visibleCells.map { $0.frame.intersection(self.bounds) }.max(by: { a, b in a.height > b.height }) ?? .zero*/
-        distance = distance + focusRect.origin.y
-        
-        scrollRectToVisible(currentFrame.offsetBy(dx: 0, dy: distance), animated: true)
-        
-        // Use the new offset to adjust your UI, for example by changing a layout guide, offsetting
-        // your view, changing a scroll inset, and so on. This example uses the new offset to update
-        // the value of an existing Auto Layout constraint on the view.
-//        movingBottomConstraint.constant = bottomOffset
+        scrollRectToVisible(visibleCellOnScreen.frame, animated: true)
     }
     
     @objc func willHideKeyboard(_ notification: Notification) {
@@ -185,6 +160,25 @@ extension NothingCollectionView {
 }
 
 extension UICollectionView {
+    
+    var expectedSectionHeight: CGFloat {
+        return (self.bounds.height * 1/10) //collection view compositional layout dimensions
+    }
+    
+    var expectedCellItemHeight: CGFloat {
+        return (self.bounds.height * 4/5)    //collection view compositional layout dimensions
+    }
+    
+    func expectedOffset(at indexPath: IndexPath) -> CGFloat {
+        var offset: CGFloat = 0.0
+        for _ in 0...indexPath.section {
+            offset += expectedSectionHeight
+            for _ in 0...indexPath.row {
+                offset += expectedCellItemHeight
+            }
+        }
+        return offset
+    }
     
     var maxVisibleMinY: CGFloat {
         return visibleCells.map { $0.frame.minY }.max() ?? 0.0

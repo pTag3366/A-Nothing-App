@@ -119,12 +119,11 @@ extension NothingCollectionView {
         // Use that screen to get the coordinate space to convert from.
         let fromCoordinateSpace = screen.coordinateSpace
 
-        
+//        var visibleCellOnScreen = NothingCollectionViewCell()
         let cellAtCenterIndexPath = indexPathForItem(at: CGPoint(x: self.bounds.midX, y: self.bounds.midY))
-        let visibleCellOnScreen = visibleCells.first(where:  {
-            let nothingCell = $0 as! NothingCollectionViewCell
-            return nothingCell.indexPathFromAccessibilityLabel == cellAtCenterIndexPath
-        }) as! NothingCollectionViewCell
+        let visibleCellOnScreen = visibleCells.compactMap { $0 as? NothingCollectionViewCell }
+        let isCellSelected = visibleCellOnScreen.first(where: { $0.textView.isFirstResponder })!
+        
         // Get your view's coordinate space.
 //        let toCoordinateSpace: UICoordinateSpace = view
 
@@ -143,7 +142,7 @@ extension NothingCollectionView {
         
 //        distance = self.bounds.height - maxIntersect
                 
-        scrollRectToVisible(visibleCellOnScreen.frame, animated: true)
+        scrollRectToVisible(isCellSelected.frame, animated: true)
     }
     
     @objc func willHideKeyboard(_ notification: Notification) {

@@ -22,7 +22,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     @objc func handleKeyboardDidShow() {
-
+//        print("keyboardNotificationDidShow")
     }
     
     private func configure() {
@@ -44,7 +44,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-
+//        print("textViewDidBeginEditing !")
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
@@ -52,7 +52,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-
+//        print("textViewDidEndEditing !")
     }
 
 }

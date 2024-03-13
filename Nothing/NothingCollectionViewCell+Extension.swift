@@ -8,6 +8,9 @@
 import Foundation
 
 extension NothingCollectionViewCell {
+    var stackViewFrame: CGRect {
+        return stackView.frame
+    }
     
     var indexPathFromAccessibilityLabel: IndexPath {
         guard let components = accessibilityLabel?.components(separatedBy: ","),

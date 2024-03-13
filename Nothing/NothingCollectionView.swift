@@ -10,6 +10,7 @@ import UIKit
 class NothingCollectionView: UICollectionView {
     
     let textViewWillResignFirstResponder = Notification.Name("textViewWillResign")
+    var totalNumberOfItems: Int = 0
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -17,17 +18,6 @@ class NothingCollectionView: UICollectionView {
     
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
-        configure()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.textViewWillResign(_:)), name: textViewWillResignFirstResponder, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    func configure() {
         dataSource = self
         delegate = self
         register(NothingCollectionViewCell.self,
@@ -40,7 +30,16 @@ class NothingCollectionView: UICollectionView {
                  withReuseIdentifier: NothingCollectionViewReusableView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         accessibilityLabel = "NothingCollectionView"
+//        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.willDisplayKeyboard(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.textViewWillResign(_:)), name: textViewWillResignFirstResponder, object: nil)
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    
     
 }
 
@@ -57,12 +56,13 @@ extension NothingCollectionView: UICollectionViewDataSource {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return Int.random(in: 0...10)
+        return 10/*Int.random(in: 0...10)*/
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let itemsInSection = Int.random(in: 0...10)
-        return itemsInSection
+        totalNumberOfItems += itemsInSection
+        return 10/*itemsInSection*/
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -84,10 +84,9 @@ extension NothingCollectionView: UICollectionViewDataSource {
 extension NothingCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
+        guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
 
         NotificationCenter.default.post(name: textViewWillResignFirstResponder, object: nil, userInfo: nil)
-
     }
 }
 
@@ -97,18 +96,19 @@ extension NothingCollectionView {
     }
     
     @objc func willDisplayKeyboard(_ notification: Notification) {
-
     }
     
     @objc func didShowKeyboard(_ notification: Notification) {
         guard let userInfo = notification.userInfo else { return }
-
 
         // In iOS 16.1 and later, the keyboard notification object is the screen the keyboard appears on.
         guard let screen = notification.object as? UIScreen,
               // Get the keyboard’s frame at the end of its animation.
               let keyboardFrameEnd = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
+        // Use that screen to get the coordinate space to convert from.
+        let _ = screen.coordinateSpace
+
         let visibleCellOnScreen = visibleCells.compactMap { $0 as? NothingCollectionViewCell }
         let isCellSelected = visibleCellOnScreen.first(where: { $0.textView.isFirstResponder })!
                 
@@ -121,5 +121,9 @@ extension NothingCollectionView {
     
     @objc func didHideKeyboard(_ notification: Notification) {
 
+    }
+    
+    private func adjustForKeyboard(_ rect: CGRect) {
+        
     }
 }

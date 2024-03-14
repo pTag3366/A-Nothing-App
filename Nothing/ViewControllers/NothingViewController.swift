@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import CoreData
 
 class NothingViewController: UIViewController {
 
     var collectionView: UICollectionView!
     var nothingLayout: UICollectionViewLayout!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("viewDidLoad")

@@ -6,10 +6,33 @@
 //
 
 import UIKit
+import CoreData
 
 class NothingCollectionView: UICollectionView {
     
     let textViewWillResignFirstResponder = Notification.Name("textViewWillResign")
+    
+    lazy var persistentContainer: NSPersistentContainer = {
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        return appDelegate!.persistenceContainer
+    }()
+
+    lazy var fetchedResultsController: NSFetchedResultsController<Note> = {
+        let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Date.dateCreated, ascending: true)]
+        let controller: NSFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+                                                                                managedObjectContext: persistentContainer.viewContext,
+                                                                                sectionNameKeyPath: nil,
+                                                                                cacheName: nil)
+        controller.delegate = self
+        do {
+            try controller.performFetch()
+        } catch {
+            fatalError("\(#function) failed to perform fetch: \(error)")
+        }
+        
+        return controller
+    }()
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -57,21 +80,23 @@ extension NothingCollectionView: UICollectionViewDataSource {
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return Int.random(in: 0...10)
+        return fetchedResultsController.sections?.count ?? 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let itemsInSection = Int.random(in: 0...10)
+        let itemsInSection = fetchedResultsController.sections?[section].numberOfObjects ?? 1
         return itemsInSection
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
-            
-            let placeholder = indexPath.commaSeparatedStringRepresentation
-            cell.textView.setPlaceholderText(with: placeholder)
-            cell.setAccessibilityLabel(with: placeholder)
+            let note = fetchedResultsController.object(at: indexPath)
+            let text = String(data: note.textData ?? Data(), encoding: .utf8) ?? "Couldn't load data"
+            cell.textView.setPlaceholderText(with: text)
+//            let placeholder = indexPath.commaSeparatedStringRepresentation
+//            cell.textView.setPlaceholderText(with: placeholder)
+//            cell.setAccessibilityLabel(with: placeholder)
             return cell
         }
         else {
@@ -122,4 +147,8 @@ extension NothingCollectionView {
     @objc func didHideKeyboard(_ notification: Notification) {
 
     }
+}
+
+extension NothingCollectionView: NSFetchedResultsControllerDelegate {
+    
 }

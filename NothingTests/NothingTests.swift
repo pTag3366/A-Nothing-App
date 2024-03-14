@@ -9,6 +9,13 @@ import XCTest
 @testable import Nothing
 
 final class NothingTests: XCTestCase {
+    
+    var dateComponents: DateComponents = {
+        var dateComponents = DateComponents()
+        dateComponents.calendar = Calendar(identifier: .gregorian)
+        dateComponents.year = 2024
+        return dateComponents
+    }()
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -56,6 +63,26 @@ final class NothingTests: XCTestCase {
         let intersectingRect = backgroundRect.intersection(overlappingRect)
         XCTAssertTrue(intersectingRect.intersects(overlappingRect))
         XCTAssertEqual(intersectingRect, CGRect(x: 0, y: 200, width: 100, height: 200))
+    }
+    
+    func testDateComponentsReturnsValidDate() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        
+        for day in stride(from: 1, through: 365, by: Int.random(in: 0...28)) {
+            let month = (day/30)
+            dateComponents.year = 2024
+            dateComponents.month = month
+            dateComponents.day = day
+            dateComponents.hour = Int.random(in: 0...23)
+            dateComponents.minute = Int.random(in: 0...59)
+            dateComponents.second = Int.random(in: 0...59)
+            for note in stride(from: 1, through: Int.random(in: 1...5), by: 1) {
+                guard let date = dateComponents.date else { return }
+                let dateString = dateFormatter.string(from: date)
+            }
+            
+        }
     }
     
     func testPerformanceExample() throws {

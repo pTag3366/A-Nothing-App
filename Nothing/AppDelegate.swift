@@ -6,10 +6,22 @@
 //
 
 import UIKit
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    lazy var persistenceContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Nothing")
+        container.loadPersistentStores(completionHandler: { (_, error) in
+            guard let error = error as? NSError else { return }
+            print("\(#function): failed to load persistent stores: \(error)")
+        })
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        SampleNotes.generateSampleDataIfNeeded(context: container.newBackgroundContext())
+        
+        return container
+    }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

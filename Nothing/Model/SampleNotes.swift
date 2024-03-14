@@ -42,7 +42,7 @@ struct SampleNotes {
         let url = URL(string: note.uuid?.uuidString ?? "unknownURL")
         let textData = randomText(length: Int.random(in: 1...200)).utf8
         note.uuid = uuid
-//        note.dateCreated = dateComponents.calendar?.date(from: dateComponents)
+        note.dateCreated = dateComponents.calendar?.date(from: dateComponents)
 //        note.dateModified = dateComponents.calendar?.date(from: dateComponents)
         note.url = url
         note.textData = Data(textData)

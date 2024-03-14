@@ -19,7 +19,7 @@ class NothingCollectionView: UICollectionView {
 
     lazy var fetchedResultsController: NSFetchedResultsController<Note> = {
         let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Date.dateCreated, ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Dates.dateCreated, ascending: true)]
         let controller: NSFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
                                                                                 managedObjectContext: persistentContainer.viewContext,
                                                                                 sectionNameKeyPath: nil,
@@ -92,11 +92,11 @@ extension NothingCollectionView: UICollectionViewDataSource {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
             let note = fetchedResultsController.object(at: indexPath)
-            let text = String(data: note.textData ?? Data(), encoding: .utf8) ?? "Couldn't load data"
-            cell.textView.setPlaceholderText(with: text)
-//            let placeholder = indexPath.commaSeparatedStringRepresentation
-//            cell.textView.setPlaceholderText(with: placeholder)
-//            cell.setAccessibilityLabel(with: placeholder)
+            var text = String(data: note.textData ?? Data(), encoding: .utf8) ?? "Couldn't load data"
+            text += SampleNotes.dateFormatter.string(from: note.dateCreated!)
+            let indexPathLabel = indexPath.commaSeparatedStringRepresentation
+            cell.textView.setNoteText(with: text)
+            cell.setAccessibilityLabel(with: indexPathLabel)
             return cell
         }
         else {

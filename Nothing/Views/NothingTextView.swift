@@ -35,8 +35,8 @@ class NothingTextView: UITextView, UITextViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setPlaceholderText(with string: String) {
-        text = string.components(separatedBy: ",").joined()
+    func setNoteText(with string: String) {
+        text = string
     }
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {

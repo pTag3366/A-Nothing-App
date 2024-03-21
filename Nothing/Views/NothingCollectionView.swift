@@ -10,7 +10,7 @@ import CoreData
 
 class NothingCollectionView: UICollectionView {
     
-    let textViewWillResignFirstResponder = Notification.Name("textViewWillResign")
+    private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
     
     lazy var persistentContainer: NSPersistentContainer = {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
@@ -42,12 +42,11 @@ class NothingCollectionView: UICollectionView {
         super.init(frame: frame, collectionViewLayout: layout)
         configure()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(NothingCollectionView.textViewWillResign(_:)), name: textViewWillResignFirstResponder, object: nil)
+        notifications.addKeyboardEventsObserver(self)
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        notifications.removeObserverObjects()
     }
     
     func configure() {
@@ -99,9 +98,7 @@ extension NothingCollectionView: UICollectionViewDataSource {
             let indexPathLabel = indexPath.commaSeparatedStringRepresentation
             cell.setAccessibilityLabel(with: indexPathLabel)
             
-            guard let noteText = String(data: note.textData ?? Data(), encoding: .utf8),
-                  let dateCreated = note.dateCreated,
-                  let dateModified = note.lastModified else { return UICollectionViewCell() }
+            guard let noteText = String(data: note.textData ?? Data(), encoding: .utf8) else { return UICollectionViewCell() }
             
             cell.textView.setNoteText(with: noteText)
             
@@ -118,9 +115,7 @@ extension NothingCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
-
-        NotificationCenter.default.post(name: textViewWillResignFirstResponder, object: nil, userInfo: nil)
-
+        notifications.postTextViewWillResignNotification()
     }
 }
 

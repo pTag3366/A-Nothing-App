@@ -18,28 +18,14 @@ public class Note: NSManagedObject {
     
     struct Dates {
         static let dateCreated = "dateCreated"
-        static let dateModified = "dateModified"
+        static let lastModified = "lastModified"
     }
     
-//    @NSManaged private var persistedDateCreated: Date?
-//    @NSManaged private var persistedDateModified: Date?
-    
     @NSManaged public var dateCreated: Date?
-    @NSManaged public var dateModified: Date?
+    @NSManaged public var lastModified: Date?
     @NSManaged public var textData: Data?
     @NSManaged public var url: URL?
     @NSManaged public var uuid: UUID?
     
-//    @objc public var dateCreated: Date? {
-//        get {
-//            willAccessValue(forKey: Dates.dateCreated)
-//            defer { didAccessValue(forKey: Dates.dateCreated) }
-//            return persistedDateCreated
-//        }
-//        set {
-//            willChangeValue(forKey: Dates.dateCreated)
-//            defer { didChangeValue(forKey: Dates.dateCreated) }
-//            persistedDateCreated = newValue
-//        }
-//    }
+    
 }

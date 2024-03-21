@@ -21,7 +21,7 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .blue
+        backgroundColor = .white
         accessibilityLabel = "NothingCollectionViewReusableView"
         configure()
     }
@@ -30,12 +30,12 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.adjustsFontForContentSizeCategory = true
-        let inset = CGFloat(0)
+        
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: inset),
-            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -inset),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: inset),
-            label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -inset)
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            label.trailingAnchor.constraint(equalTo: trailingAnchor),
+            label.topAnchor.constraint(equalTo: topAnchor),
+            label.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
         label.font = UIFont.preferredFont(forTextStyle: .title3)
     }

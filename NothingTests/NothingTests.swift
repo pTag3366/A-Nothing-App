@@ -77,9 +77,9 @@ final class NothingTests: XCTestCase {
             dateComponents.hour = Int.random(in: 0...23)
             dateComponents.minute = Int.random(in: 0...59)
             dateComponents.second = Int.random(in: 0...59)
-            for note in stride(from: 1, through: Int.random(in: 1...5), by: 1) {
+            for _ in stride(from: 1, through: Int.random(in: 1...5), by: 1) {
                 guard let date = dateComponents.date else { return }
-                let dateString = dateFormatter.string(from: date)
+                _ = dateFormatter.string(from: date)
             }
             
         }

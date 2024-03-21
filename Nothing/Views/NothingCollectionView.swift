@@ -22,7 +22,7 @@ class NothingCollectionView: UICollectionView {
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Dates.dateCreated, ascending: true)]
         let controller: NSFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
                                                                                 managedObjectContext: persistentContainer.viewContext,
-                                                                                sectionNameKeyPath: nil,
+                                                                                sectionNameKeyPath: Note.Dates.dateCreated,
                                                                                 cacheName: nil)
         controller.delegate = self
         do {
@@ -74,7 +74,11 @@ extension NothingCollectionView: UICollectionViewDataSource {
                                                                                       withReuseIdentifier: NothingCollectionViewReusableView.sectionHeader,
                                                                                       for: indexPath) as? NothingCollectionViewReusableView
         else { return UICollectionReusableView() }
-        supplementaryView.label.text = NothingCollectionViewReusableView.sectionHeader
+        
+        let sections = fetchedResultsController.sections
+        if let sectionName = sections?[indexPath.section].name {
+            supplementaryView.label.text = sectionName
+        }
         
         return supplementaryView
     }
@@ -92,11 +96,15 @@ extension NothingCollectionView: UICollectionViewDataSource {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
             let note = fetchedResultsController.object(at: indexPath)
-            var text = String(data: note.textData ?? Data(), encoding: .utf8) ?? "Couldn't load data"
-            text += SampleNotes.dateFormatter.string(from: note.dateCreated!)
             let indexPathLabel = indexPath.commaSeparatedStringRepresentation
-            cell.textView.setNoteText(with: text)
             cell.setAccessibilityLabel(with: indexPathLabel)
+            
+            guard let noteText = String(data: note.textData ?? Data(), encoding: .utf8),
+                  let dateCreated = note.dateCreated,
+                  let dateModified = note.lastModified else { return UICollectionViewCell() }
+            
+            cell.textView.setNoteText(with: noteText)
+            
             return cell
         }
         else {
@@ -109,7 +117,7 @@ extension NothingCollectionView: UICollectionViewDataSource {
 extension NothingCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
+        guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
 
         NotificationCenter.default.post(name: textViewWillResignFirstResponder, object: nil, userInfo: nil)
 
@@ -130,9 +138,9 @@ extension NothingCollectionView {
 
 
         // In iOS 16.1 and later, the keyboard notification object is the screen the keyboard appears on.
-        guard let screen = notification.object as? UIScreen,
+        guard let _ = notification.object as? UIScreen,
               // Get the keyboard’s frame at the end of its animation.
-              let keyboardFrameEnd = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+              let _ = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
         let visibleCellOnScreen = visibleCells.compactMap { $0 as? NothingCollectionViewCell }
         let isCellSelected = visibleCellOnScreen.first(where: { $0.textView.isFirstResponder })!
@@ -150,5 +158,7 @@ extension NothingCollectionView {
 }
 
 extension NothingCollectionView: NSFetchedResultsControllerDelegate {
-    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        reloadData()
+    }
 }

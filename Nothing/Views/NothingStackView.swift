@@ -33,11 +33,11 @@ class NothingStackView: UIStackView {
     }
     
     func drawShadowLayer(_ rect: CGRect) {
-        let offset: CGRect = rect.offsetBy(dx: 0, dy: dy)
+        let offset: CGRect = rect.offsetBy(dx: 0, dy: dy - 10)
 
         let shadowPath = CGMutablePath()
         let shadowHeight: CGFloat = 20
-        let shadowRadius: CGFloat = 5
+        let shadowRadius: CGFloat = 2
         let yOffset: CGFloat = -shadowHeight - shadowRadius
         let xOffset: CGFloat = -shadowHeight - shadowRadius
 

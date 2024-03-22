@@ -18,7 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("\(#function): failed to load persistent stores: \(error)")
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
-        SampleNotes.generateSampleDataIfNeeded(context: container.newBackgroundContext())
+//        SampleNotes.generateSampleDataIfNeeded(context: container.newBackgroundContext())
+        SampleNotes.generateEmptyNoteIfNeeded(context: container.newBackgroundContext())
         
         return container
     }()

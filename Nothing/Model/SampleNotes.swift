@@ -28,7 +28,7 @@ struct SampleNotes {
         return String((0..<length).map { _ in letters.randomElement()! })
     }
     
-    static func generateNewNote(with components: DateComponents, context: NSManagedObjectContext) {
+    static func generateNewRandomNote(with components: DateComponents, context: NSManagedObjectContext) {
         let note = Note(context: context)
         
         let uuid = UUID()
@@ -43,6 +43,31 @@ struct SampleNotes {
         note.textData = Data(textData)
     }
     
+    static func generateNewEmptyNote(context: NSManagedObjectContext) {
+        let note = Note(context: context)
+        
+        note.uuid = UUID()
+        let url = URL(string: note.uuid?.uuidString ?? "unknownURL")
+        note.url = url
+        let date = Date()
+        note.dateCreated = date
+        note.lastModified = date //
+    }
+    
+    static func generateEmptyNoteIfNeeded(context: NSManagedObjectContext) {
+        context.perform {
+            guard let numberOfNotes = try? context.count(for: Note.fetchRequest()), numberOfNotes == 0 else {
+                return //
+            }
+            generateNewEmptyNote(context: context)
+            do {
+                try context.save()
+            } catch {
+                print("error saving data: \(error)")
+            }
+        }
+    }
+    
     static func generateSampleDataIfNeeded(context: NSManagedObjectContext) {
         context.perform {
             guard let numberOfNotes = try? context.count(for: Note.fetchRequest()), numberOfNotes == 0 else {
@@ -50,7 +75,7 @@ struct SampleNotes {
             }
             for day in stride(from: 1, through: 365, by: 70) {
                 dateComponents.day = day
-                generateNewNote(with: dateComponents, context: context)
+                generateNewRandomNote(with: dateComponents, context: context)
             }
             do {
                 try context.save()

@@ -27,5 +27,10 @@ public class Note: NSManagedObject {
     @NSManaged public var url: URL?
     @NSManaged public var uuid: UUID?
     
-    
+    class func formatHeaderTitle(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMM d, yyyy"
+        formatter.string(for: date)
+        return formatter.string(from: date)
+    }
 }

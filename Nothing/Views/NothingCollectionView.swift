@@ -74,10 +74,14 @@ extension NothingCollectionView: UICollectionViewDataSource {
                                                                                       for: indexPath) as? NothingCollectionViewReusableView
         else { return UICollectionReusableView() }
         
-        let sections = fetchedResultsController.sections
-        if let sectionName = sections?[indexPath.section].name {
-            supplementaryView.label.text = sectionName
+//        let sections = fetchedResultsController.sections
+        let note = fetchedResultsController.object(at: indexPath)
+        if let date = note.dateCreated {
+            supplementaryView.label.text = Note.formatHeaderTitle(date)
         }
+//        if let sectionName = sections?[indexPath.section].name {
+//            supplementaryView.label.text = sectionName
+//        }
         
         return supplementaryView
     }
@@ -98,9 +102,9 @@ extension NothingCollectionView: UICollectionViewDataSource {
             let indexPathLabel = indexPath.commaSeparatedStringRepresentation
             cell.setAccessibilityLabel(with: indexPathLabel)
             
-            guard let noteText = String(data: note.textData ?? Data(), encoding: .utf8) else { return UICollectionViewCell() }
-            
-            cell.textView.setNoteText(with: noteText)
+            if let noteText = String(data: note.textData ?? Data(), encoding: .utf8) {
+                cell.textView.setNoteText(with: noteText)
+            }
             
             return cell
         }
@@ -115,17 +119,39 @@ extension NothingCollectionView: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
+        
         notifications.postTextViewWillResignNotification()
     }
 }
 
 extension NothingCollectionView {
-    @objc func textViewWillResign(_ notification: Notification) {
+    @objc func textViewWillResignEditing(_ notification: Notification) {
         endEditing(true)
     }
     
-    @objc func willDisplayKeyboard(_ notification: Notification) {
-
+    @objc func saveChanges(_ notification: Notification) {
+        let managedContext = persistentContainer.newBackgroundContext()
+        
+        managedContext.perform {
+            guard let info = notification.userInfo, let text = info["text"] as? String, let textData = text.data(using: .utf8) else { return }
+            
+            let note = Note(context: managedContext)
+            let uuid = UUID()
+            let date = Date()
+            note.uuid = uuid
+            if let url = URL(string: uuid.uuidString) {
+                note.url = url
+            }
+            note.dateCreated = date
+            note.lastModified = date
+            note.textData = textData
+            
+            do {
+                try managedContext.save()
+            } catch {
+                print("error saving data: \(error)")
+            }
+        }
     }
     
     @objc func didShowKeyboard(_ notification: Notification) {
@@ -141,14 +167,6 @@ extension NothingCollectionView {
         let isCellSelected = visibleCellOnScreen.first(where: { $0.textView.isFirstResponder })!
                 
         scrollRectToVisible(isCellSelected.frame, animated: true)
-    }
-    
-    @objc func willHideKeyboard(_ notification: Notification) {
-
-    }
-    
-    @objc func didHideKeyboard(_ notification: Notification) {
-
     }
 }
 

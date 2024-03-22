@@ -9,6 +9,8 @@ import UIKit
 
 class NothingTextView: UITextView, UITextViewDelegate {
     
+    private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
+    
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         delegate = self
@@ -19,10 +21,6 @@ class NothingTextView: UITextView, UITextViewDelegate {
     
     deinit {
         
-    }
-    
-    @objc func handleKeyboardDidShow() {
-
     }
     
     private func configure() {
@@ -52,7 +50,8 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-
+        if !textView.text.isEmpty {
+            notifications.postTextViewWillSaveChangesNotification(text)
+        }
     }
-
 }

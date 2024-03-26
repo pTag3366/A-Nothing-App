@@ -10,11 +10,18 @@ import UIKit
 class NothingCollectionViewCell: UICollectionViewCell {
     
     static let nothingCollectionViewCellId = "NothingCollectionViewCellReuseId"
-    var textView: NothingTextView!
-    var stackView: NothingStackView!
-    var sideLength: CGFloat {
+    private var textView: NothingTextView!
+    private var stackView: NothingStackView!
+    var textViewIsFirstResponder: Bool {
+        return textView.isFirstResponder
+    }
+    private var sideLength: CGFloat {
         return frame.width < frame.height ? (frame.width * 0.8) : (frame.height * 0.8)
     }
+    private lazy var gestureRecognizer: UIPinchGestureRecognizer = {
+        let gestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(NothingCollectionViewCell.deleteNote))
+        return gestureRecognizer
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,6 +34,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
         
         configure()
+        addDeleteGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -35,11 +43,28 @@ class NothingCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
     }
     
     func setAccessibilityLabel(with string: String) {
         accessibilityLabel = "NothingCollectionViewCell" + string
+    }
+    
+    private func addDeleteGesture() {
+        addGestureRecognizer(gestureRecognizer)
+    }
+    
+    @objc func deleteNote() {
+        if gestureRecognizer.state == .ended {
+            print("deleteNote...")
+        }
+    }
+    
+    func setNote(_ note: Note, for indexPath: IndexPath) {
+        let indexPathLabel = indexPath.commaSeparatedStringRepresentation
+        setAccessibilityLabel(with: indexPathLabel)
+        if let noteText = String(data: note.textData ?? Data(), encoding: .utf8) {
+            textView.setNoteText(with: noteText)
+        }
     }
     
     private func configure() {

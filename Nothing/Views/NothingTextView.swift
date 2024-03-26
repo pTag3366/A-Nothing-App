@@ -50,8 +50,10 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        if !textView.text.isEmpty {
-            notifications.postTextViewWillSaveChangesNotification(text)
+        if let textString = textView.text, !textString.isEmpty {
+            var info = [AnyHashable: Any]()
+            info.updateValue(textString, forKey: "textString")
+            notifications.postTextViewDidEndEditingNotification(info, object: textView)
         }
     }
 }

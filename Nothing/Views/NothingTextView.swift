@@ -53,7 +53,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
         if let textString = textView.text, !textString.isEmpty {
             var info = [AnyHashable: Any]()
             info.updateValue(textString, forKey: "textString")
-            notifications.postTextViewDidEndEditingNotification(info, object: textView)
+            notifications.postTextViewDidEndEditingNotification(info, object: nil)
         }
     }
 }

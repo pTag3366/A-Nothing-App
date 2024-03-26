@@ -9,7 +9,7 @@ import UIKit
 
 class NothingCollectionViewReusableView: UICollectionReusableView {
     
-    let label = UILabel()
+    private let label = UILabel()
     
     static let sectionHeader = "SectionHeaderReuseId"
     static let sectionFooter = "SectionFooterReuseId"
@@ -24,6 +24,10 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
         backgroundColor = .white
         accessibilityLabel = "NothingCollectionViewReusableView"
         configure()
+    }
+    
+    func setSectionTitle(_ text: String) {
+        label.text = text
     }
     
     private func configure() {

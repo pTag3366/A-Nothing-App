@@ -9,6 +9,8 @@ import UIKit
 
 class NothingCollectionViewCell: UICollectionViewCell {
     
+    private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
+    
     static let nothingCollectionViewCellId = "NothingCollectionViewCellReuseId"
     private var textView: NothingTextView!
     private var stackView: NothingStackView!
@@ -34,7 +36,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
         
         configure()
-        addDeleteGesture()
+//        addDeleteGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -55,7 +57,9 @@ class NothingCollectionViewCell: UICollectionViewCell {
     
     @objc func deleteNote() {
         if gestureRecognizer.state == .ended {
-            print("deleteNote...")
+            var info = [AnyHashable: Any]()
+            info.updateValue(indexPathFromAccessibilityLabel, forKey: "indexPath")
+            notifications.postDeleteNoteGestureNotification(info, object: self)
         }
     }
     

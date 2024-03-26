@@ -51,6 +51,7 @@ public class Note: NSManagedObject {
             willChangeValue(forKey: Dates.dateCreated)
             defer { didChangeValue(forKey: Dates.dateCreated) }
             primitiveDateCreated = newValue
+            primitiveDateString = nil
         }
     }
     
@@ -71,6 +72,18 @@ public class Note: NSManagedObject {
     
     func update(from notes: Notes) throws {
         let dictionary = notes.dictionaryValue
-        
+        guard let newDateCreated = dictionary["dateCreated"] as? Date,
+              let newLastModified = dictionary["lastModified"] as? Date,
+              let newUuid = dictionary["uuid"] as? UUID,
+              let newUrl = dictionary["url"] as? URL,
+              let newTextData = dictionary["textData"] as? Data
+        else {
+            throw NoteError.incompleteData
+        }
+        dateCreated = newDateCreated
+        lastModified = newLastModified
+        uuid = newUuid //???
+        url = newUrl   //???
+        textData = newTextData
     }
 }

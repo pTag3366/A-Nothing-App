@@ -19,7 +19,7 @@ class NothingCollectionView: UICollectionView {
 
     lazy var fetchedResultsController: NSFetchedResultsController<Note> = {
         let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Dates.dateCreated, ascending: false)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Dates.dateCreated, ascending: true)]
         let controller: NSFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
                                                                                 managedObjectContext: persistentContainer.viewContext,
                                                                                 sectionNameKeyPath: Note.Dates.dateString,
@@ -107,11 +107,18 @@ extension NothingCollectionView: UICollectionViewDataSource {
 
 extension NothingCollectionView: UICollectionViewDelegate {
     
+    func collectionView(_ collectionView: UICollectionView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
+        let note = fetchedResultsController.object(at: indexPath)
+        deleteNote(note)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
-//        guard let notes = fetchedResultsController.fetchedObjects else { return }
-//        let note = fetchedResultsController.object(at: indexPath)
-        
+
         notifications.postTextViewWillResignNotification(nil, object: nil)
     }
 }
@@ -129,10 +136,16 @@ extension NothingCollectionView {
         else { return }
         
         let taskContext = newBackgroundTaskContext()
+        
         taskContext.perform {
             let note = Note(context: taskContext, data: textData)
             
             do {
+                let noteDict = try Notes(from: note)
+                let batchInsert = NSBatchInsertRequest(entity: Note.entity(), dictionaryHandler: { dict in
+                    dict.addEntries(from: noteDict.dictionaryValue)
+                    return true
+                })
                 try taskContext.save()
             } catch {
                 print(error)
@@ -140,8 +153,23 @@ extension NothingCollectionView {
         }
     }
     
-    @objc func deleteNote() {
-        print("deleteNote...")
+    func deleteNote(_ note: Note) {
+        guard let info = note.textData else { return }
+        let viewContext = persistentContainer.viewContext
+        viewContext.perform {
+            let objToDelete = viewContext.object(with: note.objectID)
+            viewContext.delete(objToDelete)
+        }
+    }
+    
+    func removeNote(_ note: Note) {
+        let taskContext = newBackgroundTaskContext()
+        taskContext.perform {
+            let deleteRequest = NSBatchDeleteRequest(objectIDs: [note.objectID])
+            let fetchResult = try? taskContext.execute(deleteRequest)
+            let deleteResult = fetchResult as? NSBatchDeleteResult
+            let result = deleteResult?.result
+        }
     }
     
     private func newBackgroundTaskContext() -> NSManagedObjectContext {
@@ -180,7 +208,8 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
         case .insert:
             print("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
         case .delete:
-            break
+            removeNote(object)
+            print("deleted note at section: \(indexPath!.section), row: \(indexPath!.row)")
         case .move:
             break
         case .update:

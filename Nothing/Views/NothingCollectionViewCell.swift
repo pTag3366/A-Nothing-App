@@ -36,7 +36,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
         
         configure()
-//        addDeleteGesture()
+        addDeleteGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -59,7 +59,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         if gestureRecognizer.state == .ended {
             var info = [AnyHashable: Any]()
             info.updateValue(indexPathFromAccessibilityLabel, forKey: "indexPath")
-            notifications.postDeleteNoteGestureNotification(info, object: self)
+            notifications.postDeleteNoteGestureNotification(info, object: nil)
         }
     }
     

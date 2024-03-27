@@ -37,7 +37,7 @@ class NothingNotificationManager {
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewWillResignEditing(_:)), name: textViewWillResignFirstResponder, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewDidEndEditingText(_:)), name: textViewDidEndEditing, object: nil)
-//        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.deleteNote(_:)), name: collectionViewCellPinchToDelete, object: nil)
+        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.deleteNote(_:)), name: collectionViewCellPinchToDelete, object: nil)
     }
     
     func postTextViewWillResignNotification(_ info: [AnyHashable: Any]?, object: Any?) {

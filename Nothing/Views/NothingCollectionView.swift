@@ -107,15 +107,6 @@ extension NothingCollectionView: UICollectionViewDataSource {
 
 extension NothingCollectionView: UICollectionViewDelegate {
     
-    func collectionView(_ collectionView: UICollectionView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
-        let note = fetchedResultsController.object(at: indexPath)
-        deleteNote(note)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
 
@@ -142,7 +133,7 @@ extension NothingCollectionView {
             
             do {
                 let noteDict = try Notes(from: note)
-                let batchInsert = NSBatchInsertRequest(entity: Note.entity(), dictionaryHandler: { dict in
+                let _ = NSBatchInsertRequest(entity: Note.entity(), dictionaryHandler: { dict in
                     dict.addEntries(from: noteDict.dictionaryValue)
                     return true
                 })
@@ -153,8 +144,10 @@ extension NothingCollectionView {
         }
     }
     
-    func deleteNote(_ note: Note) {
-        guard let info = note.textData else { return }
+    @objc func deleteNote(_ notification: Notification) {
+        guard let index = notification.userInfo?["indexPath"] as? IndexPath else { return }
+        let note = fetchedResultsController.object(at: index)
+        guard let data = note.textData else { return }
         let viewContext = persistentContainer.viewContext
         viewContext.perform {
             let objToDelete = viewContext.object(with: note.objectID)
@@ -163,12 +156,14 @@ extension NothingCollectionView {
     }
     
     func removeNote(_ note: Note) {
+        guard let data = note.textData else { return }
         let taskContext = newBackgroundTaskContext()
         taskContext.perform {
             let deleteRequest = NSBatchDeleteRequest(objectIDs: [note.objectID])
-            let fetchResult = try? taskContext.execute(deleteRequest)
-            let deleteResult = fetchResult as? NSBatchDeleteResult
-            let result = deleteResult?.result
+            guard let fetchResult = try? taskContext.execute(deleteRequest),
+            let deleteResult = fetchResult as? NSBatchDeleteResult,
+            let success = deleteResult.result as? Bool, success
+            else { return }
         }
     }
     
@@ -209,6 +204,7 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
             print("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
         case .delete:
             removeNote(object)
+            
             print("deleted note at section: \(indexPath!.section), row: \(indexPath!.row)")
         case .move:
             break
@@ -220,7 +216,7 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
     }
     
     func controller(_ controller: NSFetchedResultsController<any NSFetchRequestResult>, didChange sectionInfo: any NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        guard let objects = sectionInfo.objects as? [Note] else { return }
+        guard let _ = sectionInfo.objects as? [Note] else { return }
         
         switch type {
         case .insert:

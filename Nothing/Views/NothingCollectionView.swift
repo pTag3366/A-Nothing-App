@@ -7,10 +7,13 @@
 
 import UIKit
 import CoreData
+import OSLog
 
 class NothingCollectionView: UICollectionView {
     
     private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
+    
+    let logger = Logger(subsystem: "com.josephk.Nothing", category: "persistence")
     
     lazy var persistentContainer: NSPersistentContainer = {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
@@ -124,12 +127,13 @@ extension NothingCollectionView {
               let text = info["textString"] as? String,
               text.count > 0,
               let textData = text.data(using: .utf8)
-        else { return }
+        else { return logger.error("\(NoteError.incompleteData)") }
         
         let taskContext = newBackgroundTaskContext()
+        let note = Note(context: taskContext, data: textData)
+        logger.debug("Start batch insert request...")
         
-        taskContext.perform {
-            let note = Note(context: taskContext, data: textData)
+        taskContext.perform { [unowned self] in
             
             do {
                 let noteDict = try Notes(from: note)
@@ -139,31 +143,43 @@ extension NothingCollectionView {
                 })
                 try taskContext.save()
             } catch {
-                print(error)
+                logger.error("\(NoteError.insertError)")
             }
+            logger.debug("Finished batch insert request.")
         }
     }
     
     @objc func deleteNote(_ notification: Notification) {
-        guard let index = notification.userInfo?["indexPath"] as? IndexPath else { return }
+        guard let index = notification.userInfo?["indexPath"] as? IndexPath,
+              let _ = fetchedResultsController.object(at: index).textData
+        else {
+            return logger.error("\(NoteError.incompleteData)")
+        }
         let note = fetchedResultsController.object(at: index)
-        guard let data = note.textData else { return }
         let viewContext = persistentContainer.viewContext
-        viewContext.perform {
+        logger.debug("Start deleting object from viewContext...")
+        viewContext.perform { [unowned self] in
             let objToDelete = viewContext.object(with: note.objectID)
             viewContext.delete(objToDelete)
+            logger.debug("Finished deleting object from viewContext.")
         }
     }
     
     func removeNote(_ note: Note) {
-        guard let data = note.textData else { return }
+        guard let _ = note.textData else { return logger.error("\(NoteError.incompleteData)") }
         let taskContext = newBackgroundTaskContext()
-        taskContext.perform {
+        logger.debug("Start batch delete request in backgroundContext...")
+        taskContext.perform { [unowned self] in
             let deleteRequest = NSBatchDeleteRequest(objectIDs: [note.objectID])
             guard let fetchResult = try? taskContext.execute(deleteRequest),
             let deleteResult = fetchResult as? NSBatchDeleteResult,
             let success = deleteResult.result as? Bool, success
-            else { return }
+            else
+            {
+                logger.debug("Failed to execute batch delete request.")
+                return logger.error("\(NoteError.deleteError)")
+            }
+            logger.debug("Finished batch delete request in backgroundContext.")
         }
     }
     
@@ -175,24 +191,22 @@ extension NothingCollectionView {
     }
     
     @objc func didShowKeyboard(_ notification: Notification) {
-        guard let userInfo = notification.userInfo else { return }
-
-
-        // In iOS 16.1 and later, the keyboard notification object is the screen the keyboard appears on.
-        guard let _ = notification.object as? UIScreen,
-              // Get the keyboard’s frame at the end of its animation.
-              let _ = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        guard let userInfo = notification.userInfo,
+              let _ = notification.object as? UIScreen,
+              let _ = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+        else { return logger.error("\(NoteError.incompleteData)") }
         
         let visibleCellOnScreen = visibleCells.compactMap { $0 as? NothingCollectionViewCell }
-        let isCellSelected = visibleCellOnScreen.first(where: { $0.textViewIsFirstResponder })!
-                
-        scrollRectToVisible(isCellSelected.frame, animated: true)
+        if let isCellSelected = visibleCellOnScreen.first(where: { $0.textViewIsFirstResponder }) {
+            scrollRectToVisible(isCellSelected.frame, animated: true)
+        }
     }
 }
 
 extension NothingCollectionView: NSFetchedResultsControllerDelegate {
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        logger.debug("\(#function): reloading data...")
         reloadData()
     }
     
@@ -201,15 +215,14 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
         
         switch type {
         case .insert:
-            print("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
+            logger.debug("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
         case .delete:
             removeNote(object)
-            
-            print("deleted note at section: \(indexPath!.section), row: \(indexPath!.row)")
+            logger.debug("deleted note at section: \(indexPath!.section), row: \(indexPath!.row)")
         case .move:
             break
         case .update:
-            print("updated note at section: \(indexPath!.section), row: \(indexPath!.row)")
+            logger.debug("updated note at section: \(indexPath!.section), row: \(indexPath!.row)")
         @unknown default:
             break
         }
@@ -220,13 +233,13 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
         
         switch type {
         case .insert:
-            print("added note at section: \(sectionIndex)")
+            logger.debug("sectionInfo insert at: \(sectionIndex)")
         case .delete:
-            break
+            logger.debug("sectionInfo delete at: \(sectionIndex)")
         case .move:
             break
         case .update:
-            print("updated note at section: \(sectionIndex)")
+            logger.debug("sectionInfo update at: \(sectionIndex)")
         @unknown default:
             break
         }

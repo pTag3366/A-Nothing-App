@@ -9,6 +9,7 @@ import Foundation
 
 enum NoteError: Error {
     case incompleteData
+    case insertError
     case deleteError
 }
 

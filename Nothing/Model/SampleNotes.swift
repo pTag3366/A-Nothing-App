@@ -30,9 +30,9 @@ struct SampleNotes {
     
     static func formatHeaderTitle(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMM d, yyyy"
-        formatter.string(for: date)
-        return formatter.string(from: date)
+        formatter.locale = .current
+        formatter.setLocalizedDateFormatFromTemplate("EEEE, MMMM d, yyyy")
+        return formatter.string(from: date).localizedCapitalized
     }
     
     static func generateNewRandomNote(with components: DateComponents, context: NSManagedObjectContext) {

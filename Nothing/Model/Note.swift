@@ -78,7 +78,7 @@ public class Note: NSManagedObject {
               let newUrl = dictionary["url"] as? URL,
               let newTextData = dictionary["textData"] as? Data
         else {
-            throw NoteError.incompleteData
+            throw NoteError.incompleteData(description: "\(#function)")
         }
         dateCreated = newDateCreated
         lastModified = newLastModified

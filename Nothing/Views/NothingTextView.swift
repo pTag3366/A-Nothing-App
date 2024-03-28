@@ -7,7 +7,7 @@
 
 import UIKit
 
-class NothingTextView: UITextView, UITextViewDelegate {
+class NothingTextView: UITextView {
     
     private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
     private(set) var indexPath: IndexPath = IndexPath()
@@ -41,17 +41,16 @@ class NothingTextView: UITextView, UITextViewDelegate {
     func setNoteText(with string: String) {
         text = string
     }
+}
+
+extension NothingTextView:  UITextViewDelegate {
     
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
         return true
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        if let textString = textView.text, !textString.isEmpty {
-//            var info = [AnyHashable: Any]()
-//            info.updateValue(textString, forKey: "textString")
-//            notifications.postTextViewDidBeginEditingNotification(info, object: nil)
-        }
+        
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
@@ -59,11 +58,6 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        if let textString = textView.text, !textString.isEmpty {
-            var info = [AnyHashable: Any]()
-            info.updateValue(textString, forKey: "textString")
-            info.updateValue(indexPath, forKey: "indexPath")
-            notifications.postTextViewDidEndEditingNotification(info, object: nil)
-        }
+        
     }
 }

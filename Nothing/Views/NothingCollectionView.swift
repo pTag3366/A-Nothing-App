@@ -113,32 +113,56 @@ extension NothingCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let _ = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell else { return }
 
-        notifications.postTextViewWillResignNotification(nil, object: nil)
+        endEditing(true)
     }
 }
 
 extension NothingCollectionView {
-    @objc func textViewWillResignEditing(_ notification: Notification) {
-        endEditing(true)
+    
+    private func noteTextDidChanged(from oldText: String, to newText: String) -> Bool {
+        return !newText.elementsEqual(oldText)
     }
     
-    @objc func textViewDidChangeText(_ notification: Notification) {
-        logger.debug("textViewDidChangeText: \(notification)")
-    }
-    
-    @objc func textViewDidBeginTextUpdates(_ notification: Notification) {
-        guard let info = notification.userInfo,
-              let text = info["textString"] as? String,
-              text.count > 0,
-              let textData = text.data(using: .utf8),
-              let fetchedNotes = fetchedResultsController.fetchedObjects?.compactMap({ $0 }),
-              let note = fetchedNotes.first(where: {
-                  let string = String(data: $0.textData ?? Data(), encoding: .utf8)
-                  return string == text
-              })
-        else { return logger.error("\(NoteError.incompleteData)") }
+    @objc func didShowKeyboard(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let _ = notification.object as? UIScreen,
+              let _ = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+        else { return logger.error("\(NoteError.incompleteData(description: "\(#function)"))") }
         
-        updateNote(note: note)
+        let visibleCellOnScreen = visibleCells.compactMap { $0 as? NothingCollectionViewCell }
+        if let isCellSelected = visibleCellOnScreen.first(where: { $0.textViewIsFirstResponder }) {
+            scrollRectToVisible(isCellSelected.frame, animated: true)
+        }
+    }
+    
+    @objc func textViewDidEndEditingText(_ notification: Notification) {
+        logger.debug("\(#function): \(notification)")
+        guard let textView = notification.object as? NothingTextView,
+              let newString = textView.text,
+              let newData = newString.data(using: .utf8)
+        else { return logger.error("\(NoteError.incompleteData(description: "\(#function)"))") }
+        logger.debug("\(textView.indexPath)")
+        
+        let note = fetchedResultsController.object(at: textView.indexPath)
+        if let oldData = note.textData,
+           let oldString = String(data: oldData, encoding: .utf8),
+           !oldString.isEmpty, noteTextDidChanged(from: oldString, to: newString) { //if note was fetched from persistent store with data in it, assume we are updating if string changed
+            updateNote(note: note)
+        } else if (!newString.isEmpty && noteTextDidChanged(from: "", to: newString)) { //else create a new note, only if there's a new string from data
+            let task = newBackgroundTaskContext()
+            let newNote = Note(context: task, data: newData)
+            insertRequest(with: note, task: task)
+        }
+    }
+    
+    @objc func deleteNote(_ notification: Notification) {
+        logger.debug("\(#function): \(notification)")
+        guard let index = notification.userInfo?["indexPath"] as? IndexPath,
+              let _ = fetchedResultsController.object(at: index).textData
+        else {
+            return logger.error("\(NoteError.incompleteData(description: "\(#function)"))")
+        }
+        removeNoteFromViewContext(at: index)
     }
     
     private func updateNote(note: Note) {
@@ -148,36 +172,25 @@ extension NothingCollectionView {
             
             do {
                 let noteDict = try Notes(from: note)
+//                let deleteRequest = NSBatchDeleteRequest(objectIDs: [note.objectID])
                 let batchUpdate = NSBatchUpdateRequest(entity: Note.entity())
+//                batchUpdate.propertiesToUpdate = noteDict.dictionaryValue
                 guard let fetchResult = try? taskContext.execute(batchUpdate),
                       let updateResult = fetchResult as? NSBatchUpdateResult,
                       let success = updateResult.result as? Bool, success
                 else {
                     logger.debug("Failed to execute batch update request.")
-                    return logger.error("\(NoteError.updateError)")
+                    return logger.error("\(NoteError.incompleteData(description: "updating incomplete data..."))")
                 }
                 try taskContext.save()
             } catch {
-                logger.error("\(NoteError.insertError)")
+                logger.error("\(NoteError.updateError)")
             }
             logger.debug("Finished batch update request.")
         }
     }
     
-    @objc func textViewDidEndEditingText(_ notification: Notification) {
-        guard let info = notification.userInfo,
-              let text = info["textString"] as? String,
-              text.count > 0,
-              let textData = text.data(using: .utf8),
-              let index = info["indexPath"] as? IndexPath
-        else { return logger.error("\(NoteError.incompleteData)") }
-        logger.debug("\(index)")
-        insertRequest(data: textData)
-    }
-    
-    private func insertRequest(data: Data) {
-        let task = newBackgroundTaskContext()
-        let note = Note(context: task, data: data)
+    private func insertRequest(with note: Note, task: NSManagedObjectContext) {
         logger.debug("Start batch insert request...")
         task.perform { [unowned self] in
             do {
@@ -194,15 +207,6 @@ extension NothingCollectionView {
         }
     }
     
-    @objc func deleteNote(_ notification: Notification) {
-        guard let index = notification.userInfo?["indexPath"] as? IndexPath,
-              let _ = fetchedResultsController.object(at: index).textData
-        else {
-            return logger.error("\(NoteError.incompleteData)")
-        }
-        removeNoteFromViewContext(at: index)
-    }
-    
     private func removeNoteFromViewContext(at indexPath: IndexPath) {
         let note = fetchedResultsController.object(at: indexPath)
         let viewContext = persistentContainer.viewContext
@@ -215,7 +219,7 @@ extension NothingCollectionView {
     }
     
     private func removeNoteFromPersistentStore(_ note: Note) {
-        guard let _ = note.textData else { return logger.error("\(NoteError.incompleteData)") }
+        guard let _ = note.textData else { return logger.error("\(NoteError.incompleteData(description: "\(#function)"))") }
         let taskContext = newBackgroundTaskContext()
         logger.debug("Start batch delete request in backgroundContext...")
         taskContext.perform { [unowned self] in
@@ -239,17 +243,6 @@ extension NothingCollectionView {
         return taskContext
     }
     
-    @objc func didShowKeyboard(_ notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let _ = notification.object as? UIScreen,
-              let _ = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-        else { return logger.error("\(NoteError.incompleteData)") }
-        
-        let visibleCellOnScreen = visibleCells.compactMap { $0 as? NothingCollectionViewCell }
-        if let isCellSelected = visibleCellOnScreen.first(where: { $0.textViewIsFirstResponder }) {
-            scrollRectToVisible(isCellSelected.frame, animated: true)
-        }
-    }
 }
 
 extension NothingCollectionView: NSFetchedResultsControllerDelegate {

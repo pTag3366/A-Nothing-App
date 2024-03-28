@@ -8,7 +8,7 @@
 import Foundation
 
 enum NoteError: Error {
-    case incompleteData
+    case incompleteData(description: String)
     case insertError
     case deleteError
     case updateError
@@ -60,7 +60,7 @@ struct Notes: Decodable {
               let url = url,
               let uuid = uuid
         else {
-            throw NoteError.incompleteData
+            throw NoteError.incompleteData(description: "\(#function)")
         }
         self.dateCreated = dateCreated
         self.dateString = dateString
@@ -73,7 +73,7 @@ struct Notes: Decodable {
     init(from note: Note) throws {
         guard let url = note.url,
               let uuid = note.uuid else {
-            throw NoteError.incompleteData
+            throw NoteError.incompleteData(description: "\(#function)")
         }
         self.dateCreated = note.dateCreated ?? Date()
         self.dateString = note.dateString ?? ""

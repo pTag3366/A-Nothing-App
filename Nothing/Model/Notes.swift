@@ -11,6 +11,7 @@ enum NoteError: Error {
     case incompleteData
     case insertError
     case deleteError
+    case updateError
 }
 
 struct NotesList: Decodable {

@@ -10,10 +10,12 @@ import UIKit
 class NothingNotificationManager {
     
     private let textViewWillResignFirstResponder = Notification.Name("textViewWillResign")
-    private let textViewDidEndEditing = Notification.Name("textViewDidEndEditing")
     private let collectionViewCellPinchToDelete = Notification.Name("collectionViewCellPinchToDelete")
-    private let notificationCenter: NotificationCenter
+    private let textViewDidBeginEditing = UITextView.textDidBeginEditingNotification
+    private let textViewDidEndEditing = UITextView.textDidEndEditingNotification
+    private let textViewDidChangeText = UITextView.textDidChangeNotification
     private let keyboardDidShow = UIResponder.keyboardDidShowNotification
+    private let notificationCenter: NotificationCenter
     private var observers: [Any] = []
     
     
@@ -37,6 +39,8 @@ class NothingNotificationManager {
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewWillResignEditing(_:)), name: textViewWillResignFirstResponder, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewDidEndEditingText(_:)), name: textViewDidEndEditing, object: nil)
+        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewDidBeginTextUpdates(_:)), name: textViewDidBeginEditing, object: nil)
+//        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewDidBeginTextUpdates(_:)), name: textViewDidChangeText, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.deleteNote(_:)), name: collectionViewCellPinchToDelete, object: nil)
     }
     
@@ -52,5 +56,13 @@ class NothingNotificationManager {
     
     func postDeleteNoteGestureNotification(_ info: [AnyHashable: Any]?, object: Any?) {
         notificationCenter.post(name: collectionViewCellPinchToDelete, object: object, userInfo: info)
+    }
+    
+    func postTextViewDidBeginEditingNotification(_ info: [AnyHashable: Any]?, object: Any?) {
+        notificationCenter.post(name: textViewDidBeginEditing, object: object, userInfo: info)
+    }
+    
+    func postTextViewDidChangeTextNotification(_ info: [AnyHashable: Any]?, object: Any?) {
+        notificationCenter.post(name: textViewDidChangeText, object: object, userInfo: info)
     }
 }

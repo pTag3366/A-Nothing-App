@@ -66,6 +66,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
     func setNote(_ note: Note, for indexPath: IndexPath) {
         let indexPathLabel = indexPath.commaSeparatedStringRepresentation
         setAccessibilityLabel(with: indexPathLabel)
+        textView.setIndexPath(indexPath)
         if let noteText = String(data: note.textData ?? Data(), encoding: .utf8) {
             textView.setNoteText(with: noteText)
         }

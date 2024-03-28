@@ -122,26 +122,71 @@ extension NothingCollectionView {
         endEditing(true)
     }
     
+    @objc func textViewDidChangeText(_ notification: Notification) {
+        logger.debug("textViewDidChangeText: \(notification)")
+    }
+    
+    @objc func textViewDidBeginTextUpdates(_ notification: Notification) {
+        guard let info = notification.userInfo,
+              let text = info["textString"] as? String,
+              text.count > 0,
+              let textData = text.data(using: .utf8),
+              let fetchedNotes = fetchedResultsController.fetchedObjects?.compactMap({ $0 }),
+              let note = fetchedNotes.first(where: {
+                  let string = String(data: $0.textData ?? Data(), encoding: .utf8)
+                  return string == text
+              })
+        else { return logger.error("\(NoteError.incompleteData)") }
+        
+        updateNote(note: note)
+    }
+    
+    private func updateNote(note: Note) {
+        let taskContext = newBackgroundTaskContext()
+        logger.debug("Start batch update request...")
+        taskContext.perform { [unowned self] in
+            
+            do {
+                let noteDict = try Notes(from: note)
+                let batchUpdate = NSBatchUpdateRequest(entity: Note.entity())
+                guard let fetchResult = try? taskContext.execute(batchUpdate),
+                      let updateResult = fetchResult as? NSBatchUpdateResult,
+                      let success = updateResult.result as? Bool, success
+                else {
+                    logger.debug("Failed to execute batch update request.")
+                    return logger.error("\(NoteError.updateError)")
+                }
+                try taskContext.save()
+            } catch {
+                logger.error("\(NoteError.insertError)")
+            }
+            logger.debug("Finished batch update request.")
+        }
+    }
+    
     @objc func textViewDidEndEditingText(_ notification: Notification) {
         guard let info = notification.userInfo,
               let text = info["textString"] as? String,
               text.count > 0,
-              let textData = text.data(using: .utf8)
+              let textData = text.data(using: .utf8),
+              let index = info["indexPath"] as? IndexPath
         else { return logger.error("\(NoteError.incompleteData)") }
-        
-        let taskContext = newBackgroundTaskContext()
-        let note = Note(context: taskContext, data: textData)
+        logger.debug("\(index)")
+        insertRequest(data: textData)
+    }
+    
+    private func insertRequest(data: Data) {
+        let task = newBackgroundTaskContext()
+        let note = Note(context: task, data: data)
         logger.debug("Start batch insert request...")
-        
-        taskContext.perform { [unowned self] in
-            
+        task.perform { [unowned self] in
             do {
                 let noteDict = try Notes(from: note)
                 let _ = NSBatchInsertRequest(entity: Note.entity(), dictionaryHandler: { dict in
                     dict.addEntries(from: noteDict.dictionaryValue)
                     return true
                 })
-                try taskContext.save()
+                try task.save()
             } catch {
                 logger.error("\(NoteError.insertError)")
             }
@@ -155,7 +200,11 @@ extension NothingCollectionView {
         else {
             return logger.error("\(NoteError.incompleteData)")
         }
-        let note = fetchedResultsController.object(at: index)
+        removeNoteFromViewContext(at: index)
+    }
+    
+    private func removeNoteFromViewContext(at indexPath: IndexPath) {
+        let note = fetchedResultsController.object(at: indexPath)
         let viewContext = persistentContainer.viewContext
         logger.debug("Start deleting object from viewContext...")
         viewContext.perform { [unowned self] in
@@ -165,7 +214,7 @@ extension NothingCollectionView {
         }
     }
     
-    func removeNote(_ note: Note) {
+    private func removeNoteFromPersistentStore(_ note: Note) {
         guard let _ = note.textData else { return logger.error("\(NoteError.incompleteData)") }
         let taskContext = newBackgroundTaskContext()
         logger.debug("Start batch delete request in backgroundContext...")
@@ -217,7 +266,7 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
         case .insert:
             logger.debug("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
         case .delete:
-            removeNote(object)
+            removeNoteFromPersistentStore(object)
             logger.debug("deleted note at section: \(indexPath!.section), row: \(indexPath!.row)")
         case .move:
             break

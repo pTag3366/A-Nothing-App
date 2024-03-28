@@ -10,6 +10,7 @@ import UIKit
 class NothingTextView: UITextView, UITextViewDelegate {
     
     private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
+    private(set) var indexPath: IndexPath = IndexPath()
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
@@ -33,6 +34,10 @@ class NothingTextView: UITextView, UITextViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setIndexPath(_ index: IndexPath) {
+        indexPath = index
+    }
+    
     func setNoteText(with string: String) {
         text = string
     }
@@ -42,7 +47,11 @@ class NothingTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-
+        if let textString = textView.text, !textString.isEmpty {
+//            var info = [AnyHashable: Any]()
+//            info.updateValue(textString, forKey: "textString")
+//            notifications.postTextViewDidBeginEditingNotification(info, object: nil)
+        }
     }
     
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
@@ -53,6 +62,7 @@ class NothingTextView: UITextView, UITextViewDelegate {
         if let textString = textView.text, !textString.isEmpty {
             var info = [AnyHashable: Any]()
             info.updateValue(textString, forKey: "textString")
+            info.updateValue(indexPath, forKey: "indexPath")
             notifications.postTextViewDidEndEditingNotification(info, object: nil)
         }
     }

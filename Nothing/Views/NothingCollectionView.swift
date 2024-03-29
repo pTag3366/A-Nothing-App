@@ -19,7 +19,7 @@ class NothingCollectionView: UICollectionView {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         return appDelegate!.persistenceContainer
     }()
-
+    
     lazy var fetchedResultsController: NSFetchedResultsController<Note> = {
         let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Note.Dates.dateCreated, ascending: true)]
@@ -120,7 +120,9 @@ extension NothingCollectionView: UICollectionViewDelegate {
 extension NothingCollectionView {
     
     private func noteTextDidChanged(from oldText: String, to newText: String) -> Bool {
-        return !newText.elementsEqual(oldText)
+        let result = !newText.elementsEqual(oldText)
+        logger.debug("\(#function): \(result)")
+        return result
     }
     
     @objc func didShowKeyboard(_ notification: Notification) {
@@ -144,14 +146,15 @@ extension NothingCollectionView {
         logger.debug("\(textView.indexPath)")
         
         let note = fetchedResultsController.object(at: textView.indexPath)
-        if let oldData = note.textData,
-           let oldString = String(data: oldData, encoding: .utf8),
-           !oldString.isEmpty, noteTextDidChanged(from: oldString, to: newString) { //if note was fetched from persistent store with data in it, assume we are updating if string changed
-            updateNote(note: note)
-        } else if (!newString.isEmpty && noteTextDidChanged(from: "", to: newString)) { //else create a new note, only if there's a new string from data
+        let currentData = note.textData ?? Data()
+        let currentText = String(data: currentData, encoding: .utf8) ?? ""
+        if (!newString.isEmpty && currentText.isEmpty) {
             let task = newBackgroundTaskContext()
             let newNote = Note(context: task, data: newData)
-            insertRequest(with: note, task: task)
+            insertNote(with: newNote, task: task)
+        } else if (!currentText.isEmpty && !newString.isEmpty && noteTextDidChanged(from: currentText, to: newString)) {
+            let task = newBackgroundTaskContext()
+            updateNote(note: note, data: newData, task: task)
         }
     }
     
@@ -165,32 +168,43 @@ extension NothingCollectionView {
         removeNoteFromViewContext(at: index)
     }
     
-    private func updateNote(note: Note) {
-        let taskContext = newBackgroundTaskContext()
+    private func updateNote(note: Note, data: Data, task: NSManagedObjectContext) {
         logger.debug("Start batch update request...")
-        taskContext.perform { [unowned self] in
-            
+        logger.debug("updated objects: \(self.persistentContainer.viewContext.updatedObjects.count)")
+        task.perform { [unowned self] in
             do {
-                let noteDict = try Notes(from: note)
-//                let deleteRequest = NSBatchDeleteRequest(objectIDs: [note.objectID])
+                guard let uuid = note.uuid?.uuidString else { return logger.error("\(NoteError.incompleteData(description: "new text data unavailable..."))") }
                 let batchUpdate = NSBatchUpdateRequest(entity: Note.entity())
-//                batchUpdate.propertiesToUpdate = noteDict.dictionaryValue
-                guard let fetchResult = try? taskContext.execute(batchUpdate),
+                let newDict : [AnyHashable: Any] = [AnyHashable: Any]()
+                let predicate = NSPredicate(format: "uuid == %@", uuid)
+                batchUpdate.predicate = predicate
+                batchUpdate.propertiesToUpdate = newDict
+                let dateModified = Date()
+                batchUpdate.propertiesToUpdate?.updateValue(dateModified, forKey: "lastModified")
+                batchUpdate.propertiesToUpdate?.updateValue(data, forKey: "textData")
+                note.textData = data
+
+                assert(batchUpdate.predicate != nil && batchUpdate.propertiesToUpdate != nil)
+                
+                guard let fetchResult = try? task.execute(batchUpdate),
                       let updateResult = fetchResult as? NSBatchUpdateResult,
                       let success = updateResult.result as? Bool, success
                 else {
                     logger.debug("Failed to execute batch update request.")
                     return logger.error("\(NoteError.incompleteData(description: "updating incomplete data..."))")
                 }
-                try taskContext.save()
-            } catch {
+                try task.save()
+                
+            }
+            catch {
                 logger.error("\(NoteError.updateError)")
             }
             logger.debug("Finished batch update request.")
+            logger.debug("updated objects: \(self.persistentContainer.viewContext.updatedObjects.count)")
         }
     }
     
-    private func insertRequest(with note: Note, task: NSManagedObjectContext) {
+    private func insertNote(with note: Note, task: NSManagedObjectContext) {
         logger.debug("Start batch insert request...")
         task.perform { [unowned self] in
             do {

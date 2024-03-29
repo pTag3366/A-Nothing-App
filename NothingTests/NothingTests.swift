@@ -109,6 +109,13 @@ final class NothingTests: XCTestCase {
         }
     }
     
+    func testStringFromData() {
+        let data = Data()
+        let noteText = String(data: data, encoding: .utf8) ?? ""
+        
+        XCTAssertTrue(noteText.isEmpty)
+    }
+    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {

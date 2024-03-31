@@ -37,8 +37,6 @@ class NothingCollectionView: UICollectionView {
         return controller
     }()
     
-    private var lastIndex: IndexPath? = nil
-
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
@@ -81,7 +79,9 @@ extension NothingCollectionView: UICollectionViewDataSource {
         
         guard let sections = fetchedResultsController.sections, sections.count >= indexPath.section else { return supplementaryView }
         let section = sections[indexPath.section]
-        supplementaryView.setSectionTitle(section.name)
+        let sectionDate: String
+        sectionDate = indexPath.section == 0 ? SampleNotes.formatHeaderTitle(Date()) : section.name
+        supplementaryView.setSectionTitle(sectionDate)
         
         return supplementaryView
     }
@@ -99,8 +99,8 @@ extension NothingCollectionView: UICollectionViewDataSource {
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NothingCollectionViewCell.nothingCollectionViewCellId, for: indexPath) as? NothingCollectionViewCell
         {
             let note = fetchedResultsController.object(at: indexPath)
+            guard let _ = note.uuid else { return cell }
             cell.setNote(note, for: indexPath)
-            
             return cell
         }
         else {
@@ -108,6 +108,9 @@ extension NothingCollectionView: UICollectionViewDataSource {
         }
     }
     
+    @objc func scrollToTop() {
+        scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    }
 }
 
 extension NothingCollectionView: UICollectionViewDelegate {
@@ -143,29 +146,31 @@ extension NothingCollectionView {
         logger.debug("\(#function): \(notification)")
         guard let textView = notification.object as? NothingTextView,
               let newString = textView.text,
-              let newData = newString.data(using: .utf8)
+              let newData = newString.data(using: .utf8),
+              let indexPath = textView.indexPath
         else { return logger.error("\(NoteError.incompleteData(description: "\(#function)"))") }
-        logger.debug("\(textView.indexPath)")
         
-        let note = fetchedResultsController.object(at: textView.indexPath)
-        let currentData = note.textData ?? Data()
-        let currentText = String(data: currentData, encoding: .utf8) ?? ""
         let task = Note.newBackgroundTaskContext(persistentContainer)
-        if (!newString.isEmpty && currentText.isEmpty) {
+        let currentNote = fetchedResultsController.object(at: indexPath)
+        let currentData = currentNote.textData ?? Data()
+        let currentText = String(data: currentData, encoding: .utf8) ?? ""
+        
+        if (newString.isEmpty && !currentText.isEmpty || noteTextDidChanged(from: currentText, to: newString) && (indexPath != IndexPath(item: 0, section: 0))) {
+            updateNote(note: currentNote, data: newData, task: task)
+        } else if (!newString.isEmpty && currentText.isEmpty) {
             let newNote = Note(context: task, data: newData)
             insertNote(with: newNote, task: task)
-        } else if (!currentText.isEmpty && !newString.isEmpty && noteTextDidChanged(from: currentText, to: newString)) {
-            updateNote(note: note, data: newData, task: task)
         }
     }
     
     @objc func deleteNote(_ notification: Notification) {
         logger.debug("\(#function): \(notification)")
         guard let index = notification.userInfo?["indexPath"] as? IndexPath,
-              let _ = fetchedResultsController.object(at: index).textData
+              let _ = fetchedResultsController.object(at: index).textData   //veryfy that note has data
         else {
             return logger.error("\(NoteError.incompleteData(description: "\(#function)"))")
         }
+        
         removeNoteFromViewContext(at: index)
     }
     
@@ -196,10 +201,12 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
         logger.debug("\(#function)")
         reloadData()
-        if let index = lastIndex {
-            scrollToItem(at: index, at: .centeredVertically, animated: true)
-            lastIndex = nil
-        }
+        logger.debug("\(self.fetchedResultsController.managedObjectContext.updatedObjects.count)")
+        let index = self.fetchedResultsController.indexPath(forObject: self.fetchedResultsController.fetchedObjects!.last!)
+        scrollToItem(at: index!, at: .bottom, animated: true)
+        let isNoteEmpty = String(data: self.fetchedResultsController.object(at: IndexPath(row: 0, section: 0)).textData ?? Data(), encoding: .utf8)
+        assert(isNoteEmpty!.isEmpty)
+        
     }
     
     func controller(_ controller: NSFetchedResultsController<any NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -208,9 +215,6 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
         switch type {
         case .insert:
             logger.debug("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
-            if let lastIndexPath = newIndexPath {
-                lastIndex = lastIndexPath
-            }
         case .delete:
             removeNoteFromPersistentStore(note)
             if let indexPath = indexPath {

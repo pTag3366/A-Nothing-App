@@ -20,8 +20,13 @@ class NothingCollectionViewCell: UICollectionViewCell {
     private var sideLength: CGFloat {
         return frame.width < frame.height ? (frame.width * 0.8) : (frame.height * 0.8)
     }
-    private lazy var gestureRecognizer: UIPinchGestureRecognizer = {
+    private lazy var pinchGestureRecognizer: UIPinchGestureRecognizer = {
         let gestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(NothingCollectionViewCell.deleteNote))
+        return gestureRecognizer
+    }()
+    private lazy var doubleTapGestureRecognizer: UITapGestureRecognizer = {
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(NothingCollectionViewCell.doubleTap))
+        gestureRecognizer.numberOfTapsRequired = 2
         return gestureRecognizer
     }()
     
@@ -36,7 +41,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         
         
         configure()
-        addDeleteGesture()
+        addGestureRecognizers()
     }
     
     required init?(coder: NSCoder) {
@@ -51,12 +56,17 @@ class NothingCollectionViewCell: UICollectionViewCell {
         accessibilityLabel = "NothingCollectionViewCell" + string
     }
     
-    private func addDeleteGesture() {
-        addGestureRecognizer(gestureRecognizer)
+    private func addGestureRecognizers() {
+        addGestureRecognizer(pinchGestureRecognizer)
+        addGestureRecognizer(doubleTapGestureRecognizer)
+    }
+    
+    @objc private func doubleTap() {
+        notifications.postDoubleTapGestureNotification(nil, object: nil)
     }
     
     @objc private func deleteNote() {
-        if gestureRecognizer.state == .ended {
+        if pinchGestureRecognizer.state == .ended {
             var info = [AnyHashable: Any]()
             info.updateValue(indexPathFromAccessibilityLabel, forKey: "indexPath")
             notifications.postDeleteNoteGestureNotification(info, object: nil)
@@ -67,9 +77,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         let indexPathLabel = indexPath.commaSeparatedStringRepresentation
         setAccessibilityLabel(with: indexPathLabel)
         textView.setIndexPath(indexPath)
-        if let noteText = String(data: note.textData ?? Data(), encoding: .utf8) {
-            textView.setNoteText(with: noteText)
-        }
+        textView.setNoteText(for: note)
     }
     
     private func configure() {

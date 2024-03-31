@@ -116,6 +116,18 @@ final class NothingTests: XCTestCase {
         XCTAssertTrue(noteText.isEmpty)
     }
     
+    func testIndexPathToAny() {
+        var dictionary = [AnyHashable: Any]()
+        let indexPath = IndexPath(item: 1, section: 2)
+        let uuid = UUID()
+        
+        dictionary.updateValue(indexPath, forKey: uuid)
+        let index = dictionary[uuid] as! IndexPath
+        XCTAssertTrue(!dictionary.isEmpty)
+        XCTAssertEqual(index.item, 1)
+        XCTAssertEqual(index.section, 2)
+    }
+    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {

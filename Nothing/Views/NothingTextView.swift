@@ -10,7 +10,7 @@ import UIKit
 class NothingTextView: UITextView {
     
     private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
-    private(set) var indexPath: IndexPath = IndexPath()
+    private(set) var indexPath: IndexPath? = nil
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
@@ -38,8 +38,14 @@ class NothingTextView: UITextView {
         indexPath = index
     }
     
-    func setNoteText(with string: String) {
-        text = string
+    func setNoteText(for note: Note) {
+        guard let textData = note.textData, let textString = String(data: textData, encoding: .utf8),
+        let _ = note.uuid, let _ = note.url, let _ = note.dateCreated, let _ = note.lastModified,
+        indexPath != IndexPath(item: 0, section: 0)
+        else {
+            text = ""
+            return }
+        text = "\(textString)"
     }
 }
 

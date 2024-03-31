@@ -10,9 +10,8 @@ import UIKit
 class NothingNotificationManager {
     
     private let collectionViewCellPinchToDelete = Notification.Name("collectionViewCellPinchToDelete")
-    private let textViewDidBeginEditing = UITextView.textDidBeginEditingNotification
+    private let collectionViewCellDoubleTap = Notification.Name("collectionViewCellDoubleTap")
     private let textViewDidEndEditing = UITextView.textDidEndEditingNotification
-    private let textViewDidChangeText = UITextView.textDidChangeNotification
     private let keyboardDidShow = UIResponder.keyboardDidShowNotification
     private let notificationCenter: NotificationCenter
     private var observers: [Any] = []
@@ -38,9 +37,14 @@ class NothingNotificationManager {
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: keyboardDidShow, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewDidEndEditingText(_:)), name: textViewDidEndEditing, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.deleteNote(_:)), name: collectionViewCellPinchToDelete, object: nil)
+        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.scrollToTop), name: collectionViewCellDoubleTap, object: nil)
     }
     
     func postDeleteNoteGestureNotification(_ info: [AnyHashable: Any]?, object: Any?) {
         notificationCenter.post(name: collectionViewCellPinchToDelete, object: object, userInfo: info)
+    }
+    
+    func postDoubleTapGestureNotification(_ info: [AnyHashable: Any]?, object: Any?) {
+        notificationCenter.post(name: collectionViewCellDoubleTap, object: object, userInfo: info)
     }
 }

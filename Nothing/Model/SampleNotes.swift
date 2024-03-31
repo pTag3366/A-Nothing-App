@@ -54,7 +54,6 @@ struct SampleNotes {
         let note = Note(context: context)
         
         let uuid = UUID()
-        UserDefaults.standard.setValue(uuid.uuidString, forKey: "emptyNoteUUID")
         note.uuid = uuid
         let url = URL(string: note.uuid?.uuidString ?? "unknownURL")
         note.url = url
@@ -67,11 +66,6 @@ struct SampleNotes {
         context.perform {
             if let numberOfNotes = try? context.count(for: Note.fetchRequest()), numberOfNotes == 0 {
                 generateNewEmptyNote(context: context)
-            } else if let emptyNotes = try? context.fetch(Note.emptyNoteRequest()), emptyNotes.count == 1 {
-                let note = emptyNotes.first!
-                let date = Date()
-                note.dateCreated = date
-                note.lastModified = date
             }
             do {
                 try context.save()

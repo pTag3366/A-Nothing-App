@@ -16,15 +16,6 @@ public class Note: NSManagedObject {
         return NSFetchRequest<Note>(entityName: "Note")
     }
     
-    public class func emptyNoteRequest() -> NSFetchRequest<Note> {
-        let request = Note.fetchRequest()
-        guard let uuid = UserDefaults.standard.value(forKey: "emptyNoteUUID") as? String else { return request } // ??
-        request.predicate = NSPredicate(format: "uuid == %@", uuid)
-        request.fetchLimit = 1
-        request.sortDescriptors = [NSSortDescriptor(key: Note.Dates.dateCreated, ascending: false)]
-        return request
-    }
-    
     struct Dates {
         static let dateCreated = "dateCreated"
         static let dateString = "dateString"
@@ -81,8 +72,8 @@ public class Note: NSManagedObject {
     
     class func newBackgroundTaskContext(_ store: NSPersistentContainer) -> NSManagedObjectContext {
         let taskContext = store.newBackgroundContext()
-        taskContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy // ??
-//        taskContext.undoManager = nil
+//        taskContext.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy // ??
+//        taskContext.undoManager = UndoManager()
         return taskContext
     }
     
@@ -147,11 +138,9 @@ public class Note: NSManagedObject {
         batchUpdate.predicate = predicate
         batchUpdate.propertiesToUpdate = newDict
         let dateModified = Date()
-        batchUpdate.propertiesToUpdate?.updateValue(dateModified, forKey: "dateCreated") // ??
         batchUpdate.propertiesToUpdate?.updateValue(dateModified, forKey: "lastModified")
         batchUpdate.propertiesToUpdate?.updateValue(data, forKey: "textData")
         note.textData = data
-        note.dateCreated = dateModified
         note.lastModified = dateModified
         return batchUpdate
     }

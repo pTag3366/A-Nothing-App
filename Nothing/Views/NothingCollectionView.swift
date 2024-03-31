@@ -13,7 +13,7 @@ class NothingCollectionView: UICollectionView {
     
     private let notifications: NothingNotificationManager = NothingNotificationManager(notificationCenter: .default)
     
-    let logger = Logger(subsystem: "com.josephk.Nothing", category: "persistence")
+    private let logger = Logger(subsystem: "com.josephk.Nothing", category: "persistence")
     
     lazy var persistentContainer: NSPersistentContainer = {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate

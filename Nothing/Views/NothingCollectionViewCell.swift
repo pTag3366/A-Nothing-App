@@ -55,7 +55,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
         addGestureRecognizer(gestureRecognizer)
     }
     
-    @objc func deleteNote() {
+    @objc private func deleteNote() {
         if gestureRecognizer.state == .ended {
             var info = [AnyHashable: Any]()
             info.updateValue(indexPathFromAccessibilityLabel, forKey: "indexPath")

@@ -53,7 +53,9 @@ struct SampleNotes {
     static func generateNewEmptyNote(context: NSManagedObjectContext) {
         let note = Note(context: context)
         
-        note.uuid = UUID()
+        let uuid = UUID()
+        UserDefaults.standard.setValue(uuid.uuidString, forKey: "emptyNoteUUID")
+        note.uuid = uuid
         let url = URL(string: note.uuid?.uuidString ?? "unknownURL")
         note.url = url
         let date = Date()
@@ -63,10 +65,14 @@ struct SampleNotes {
     
     static func generateEmptyNoteIfNeeded(context: NSManagedObjectContext) {
         context.perform {
-            guard let numberOfNotes = try? context.count(for: Note.fetchRequest()), numberOfNotes == 0 else {
-                return //
+            if let numberOfNotes = try? context.count(for: Note.fetchRequest()), numberOfNotes == 0 {
+                generateNewEmptyNote(context: context)
+            } else if let emptyNotes = try? context.fetch(Note.emptyNoteRequest()), emptyNotes.count == 1 {
+                let note = emptyNotes.first!
+                let date = Date()
+                note.dateCreated = date
+                note.lastModified = date
             }
-            generateNewEmptyNote(context: context)
             do {
                 try context.save()
             } catch {

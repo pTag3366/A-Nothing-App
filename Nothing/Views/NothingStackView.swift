@@ -12,6 +12,7 @@ class NothingStackView: UIStackView {
     var dy: CGFloat {
         return frame.height
     }
+    private var shadowColor: CGColor = UIColor.black.cgColor
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,6 +31,11 @@ class NothingStackView: UIStackView {
     private func configure() {
         backgroundColor = .clear
         contentMode = .redraw
+        registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(toggleShadowColor))
+    }
+    
+    @objc func toggleShadowColor() {
+        shadowColor = shadowColor == UIColor.black.cgColor ? UIColor.white.cgColor : UIColor.black.cgColor
     }
     
     func drawShadowLayer(_ rect: CGRect) {
@@ -45,7 +51,7 @@ class NothingStackView: UIStackView {
         let newRect = offset
         
         layer.backgroundColor = UIColor.clear.cgColor
-        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowColor = shadowColor
         layer.shadowRadius = shadowRadius
         layer.shadowOpacity = 1
         

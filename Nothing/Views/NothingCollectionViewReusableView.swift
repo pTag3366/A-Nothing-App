@@ -41,7 +41,7 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
             label.topAnchor.constraint(equalTo: topAnchor),
             label.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
-        label.font = UIFont.preferredFont(forTextStyle: .title3)
+        label.font = UIFont.preferredFont(forTextStyle: .extraLargeTitle2)
     }
 }
 

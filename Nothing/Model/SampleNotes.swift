@@ -59,7 +59,7 @@ struct SampleNotes {
         note.url = url
         let date = Date()
         note.dateCreated = date
-        note.lastModified = date //
+        note.lastModified = date
     }
     
     static func generateEmptyNoteIfNeeded(context: NSManagedObjectContext) {
@@ -80,9 +80,11 @@ struct SampleNotes {
             guard let numberOfNotes = try? context.count(for: Note.fetchRequest()), numberOfNotes == 0 else {
                 return
             }
-            for day in stride(from: 1, through: 365, by: 70) {
+            for day in stride(from: 1, through: 365, by: 7) {
                 dateComponents.day = day
-                generateNewRandomNote(with: dateComponents, context: context)
+                for _ in 0...Int.random(in: 0...10) {
+                    generateNewRandomNote(with: dateComponents, context: context)
+                }
             }
             do {
                 try context.save()

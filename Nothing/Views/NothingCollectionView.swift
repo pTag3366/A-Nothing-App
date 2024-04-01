@@ -108,8 +108,11 @@ extension NothingCollectionView: UICollectionViewDataSource {
         }
     }
     
-    @objc func scrollToTop() {
-        scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    @objc func scrollToLast() {
+        if let lastNote = self.fetchedResultsController.fetchedObjects?.last,
+           let index = self.fetchedResultsController.indexPath(forObject: lastNote) {
+            scrollToItem(at: index, at: .bottom, animated: true)
+        }
     }
 }
 
@@ -192,7 +195,8 @@ extension NothingCollectionView {
     private func removeNoteFromPersistentStore(_ note: Note) {
         guard let _ = note.textData else { return logger.error("\(NoteError.incompleteData(description: "\(#function)"))") }
         logger.debug("\(#function)")
-        Note.removeNoteFromPersistentStore(note, task: Note.newBackgroundTaskContext(persistentContainer))
+        let task = Note.newBackgroundTaskContext(persistentContainer)
+        Note.removeNoteFromPersistentStore(note, task: task)
     }
 }
 
@@ -201,12 +205,6 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
         logger.debug("\(#function)")
         reloadData()
-        logger.debug("\(self.fetchedResultsController.managedObjectContext.updatedObjects.count)")
-        let index = self.fetchedResultsController.indexPath(forObject: self.fetchedResultsController.fetchedObjects!.last!)
-        scrollToItem(at: index!, at: .bottom, animated: true)
-        let isNoteEmpty = String(data: self.fetchedResultsController.object(at: IndexPath(row: 0, section: 0)).textData ?? Data(), encoding: .utf8)
-        assert(isNoteEmpty!.isEmpty)
-        
     }
     
     func controller(_ controller: NSFetchedResultsController<any NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {

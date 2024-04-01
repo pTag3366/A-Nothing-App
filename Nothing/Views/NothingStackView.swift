@@ -12,7 +12,7 @@ class NothingStackView: UIStackView {
     var dy: CGFloat {
         return frame.height
     }
-    private var shadowColor: CGColor = UIColor.black.cgColor
+    private var shadowColor: CGColor = UIColor.lightGray.cgColor
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,17 +35,17 @@ class NothingStackView: UIStackView {
     }
     
     @objc func toggleShadowColor() {
-        shadowColor = shadowColor == UIColor.black.cgColor ? UIColor.white.cgColor : UIColor.black.cgColor
+        shadowColor = shadowColor == UIColor.lightGray.cgColor ? UIColor.white.cgColor : UIColor.lightGray.cgColor
     }
     
     func drawShadowLayer(_ rect: CGRect) {
         let offset: CGRect = rect.offsetBy(dx: 0, dy: dy - 10)
 
         let shadowPath = CGMutablePath()
-        let shadowHeight: CGFloat = 20
-        let shadowRadius: CGFloat = 2
+        let shadowHeight: CGFloat = 10
+        let shadowRadius: CGFloat = 3
         let yOffset: CGFloat = -shadowHeight - shadowRadius
-        let xOffset: CGFloat = -shadowHeight - shadowRadius
+        let xOffset: CGFloat = shadowRadius
 
         assert(layer.frame.equalTo(frame))
         let newRect = offset
@@ -57,8 +57,8 @@ class NothingStackView: UIStackView {
         
         shadowPath.move(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.minY + abs(yOffset)))
         shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.minY + abs(yOffset)))
-        shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.minY + abs(yOffset) + shadowHeight))
-        shadowPath.addQuadCurve(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.minY + abs(yOffset) + shadowHeight), control: CGPoint(x: newRect.midX, y: newRect.minY + abs(yOffset)))
+        shadowPath.addLine(to: CGPoint(x: newRect.maxX - abs(xOffset), y: newRect.minY + abs(yOffset) + shadowHeight + shadowRadius))
+        shadowPath.addQuadCurve(to: CGPoint(x: newRect.minX + abs(xOffset), y: newRect.minY + abs(yOffset) + shadowHeight + shadowRadius), control: CGPoint(x: newRect.midX, y: newRect.minY + abs(yOffset + 5)))
         
         layer.shadowPath = shadowPath
     }

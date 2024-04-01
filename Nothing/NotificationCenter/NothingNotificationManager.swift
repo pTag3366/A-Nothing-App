@@ -37,7 +37,7 @@ class NothingNotificationManager {
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.didShowKeyboard(_:)), name: keyboardDidShow, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.textViewDidEndEditingText(_:)), name: textViewDidEndEditing, object: nil)
         notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.deleteNote(_:)), name: collectionViewCellPinchToDelete, object: nil)
-        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.scrollToTop), name: collectionViewCellDoubleTap, object: nil)
+        notificationCenter.addObserver(anObserver, selector: #selector(NothingCollectionView.scrollToLast), name: collectionViewCellDoubleTap, object: nil)
     }
     
     func postDeleteNoteGestureNotification(_ info: [AnyHashable: Any]?, object: Any?) {

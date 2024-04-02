@@ -12,6 +12,9 @@ class NothingViewController: UIViewController {
 
     var collectionView: UICollectionView!
     var nothingLayout: UICollectionViewLayout!
+    private let dynamicBarOffset: CGFloat = 60
+    private let regularBarOffset: CGFloat = 25
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,8 +27,15 @@ class NothingViewController: UIViewController {
     }
     
     override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews() // A place to handle device orientation changes
+        super.viewWillLayoutSubviews()
         
+        if (traitCollection.userInterfaceIdiom == .pad) {
+            view.bounds = view.frame.offsetBy(dx: 0, dy: -regularBarOffset)
+        } else if ((traitCollection.userInterfaceIdiom == .phone) && (view.bounds.height > view.bounds.width)) {
+            view.bounds = view.frame.offsetBy(dx: 0, dy: -dynamicBarOffset)
+        } else {
+            view.bounds = view.frame.offsetBy(dx: 0, dy: -regularBarOffset)
+        }
     }
 }
 

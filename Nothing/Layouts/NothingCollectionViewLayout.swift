@@ -33,7 +33,7 @@ class NothingCollectionViewLayout: UICollectionViewLayout {
             alignment: .top)
         
         sectionHeader.zIndex = 2
-//        sectionHeader.pinToVisibleBounds = true
+        sectionHeader.pinToVisibleBounds = true
         section.boundarySupplementaryItems = [sectionHeader]
         
         let layout = UICollectionViewCompositionalLayout(section: section)

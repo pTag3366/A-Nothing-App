@@ -12,7 +12,7 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
     private let label = UILabel()
     
     static let sectionHeader = "SectionHeaderReuseId"
-    static let sectionFooter = "SectionFooterReuseId"
+    private var headerColor: UIColor = UIColor.white
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -21,9 +21,16 @@ class NothingCollectionViewReusableView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
+        backgroundColor = .white
         accessibilityLabel = "NothingCollectionViewReusableView"
+        registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(toggleHeaderColor))
+        toggleHeaderColor()
         configure()
+    }
+    
+    @objc func toggleHeaderColor() {
+        headerColor = traitCollection.userInterfaceStyle == .light ? UIColor.white : UIColor.black
+        backgroundColor = headerColor
     }
     
     func setSectionTitle(_ text: String) {

@@ -32,10 +32,11 @@ class NothingStackView: UIStackView {
         backgroundColor = .clear
         contentMode = .redraw
         registerForTraitChanges([UITraitUserInterfaceStyle.self], action: #selector(toggleShadowColor))
+        toggleShadowColor()
     }
     
     @objc func toggleShadowColor() {
-        shadowColor = shadowColor == UIColor.lightGray.cgColor ? UIColor.white.cgColor : UIColor.lightGray.cgColor
+        shadowColor = traitCollection.userInterfaceStyle == .light ? UIColor.lightGray.cgColor : UIColor.white.cgColor
     }
     
     func drawShadowLayer(_ rect: CGRect) {

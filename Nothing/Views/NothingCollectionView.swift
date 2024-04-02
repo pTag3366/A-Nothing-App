@@ -60,9 +60,6 @@ class NothingCollectionView: UICollectionView {
         register(NothingCollectionViewReusableView.self,
                  forSupplementaryViewOfKind: NothingCollectionViewReusableView.sectionHeader,
                  withReuseIdentifier: NothingCollectionViewReusableView.sectionHeader)
-        register(NothingCollectionViewReusableView.self,
-                 forSupplementaryViewOfKind: NothingCollectionViewReusableView.sectionFooter,
-                 withReuseIdentifier: NothingCollectionViewReusableView.sectionFooter)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         accessibilityLabel = "NothingCollectionView"
     }

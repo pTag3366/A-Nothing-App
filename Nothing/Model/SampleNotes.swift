@@ -30,7 +30,6 @@ struct SampleNotes {
     
     static func formatHeaderTitle(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = .current
         formatter.setLocalizedDateFormatFromTemplate("EEEE, MMMM d, yyyy")
         return formatter.string(from: date).localizedCapitalized
     }

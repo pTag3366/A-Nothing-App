@@ -20,8 +20,9 @@ class NothingCollectionViewCell: UICollectionViewCell {
     private var sideLength: CGFloat {
         return frame.width < frame.height ? (frame.width * 0.8) : (frame.height * 0.8)
     }
-    private lazy var pinchGestureRecognizer: UIPinchGestureRecognizer = {
-        let gestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(NothingCollectionViewCell.deleteNote))
+    private lazy var pinchGestureRecognizer: UISwipeGestureRecognizer = {
+        let gestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(NothingCollectionViewCell.deleteNote))
+        gestureRecognizer.direction = .left
         return gestureRecognizer
     }()
     private lazy var doubleTapGestureRecognizer: UITapGestureRecognizer = {

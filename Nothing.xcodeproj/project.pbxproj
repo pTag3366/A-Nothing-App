@@ -546,6 +546,8 @@
 				DEVELOPMENT_TEAM = 45FJ2CW8X4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Nothing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "A Nothing App";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -575,6 +577,8 @@
 				DEVELOPMENT_TEAM = 45FJ2CW8X4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Nothing/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "A Nothing App";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

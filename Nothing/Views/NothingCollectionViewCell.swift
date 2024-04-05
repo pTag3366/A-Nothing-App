@@ -66,7 +66,7 @@ class NothingCollectionViewCell: UICollectionViewCell {
     }
     
     @objc private func deleteNote() {
-        if pinchGestureRecognizer.state == .ended {
+        if pinchGestureRecognizer.state == .ended && !textViewIsFirstResponder {
             var info = [AnyHashable: Any]()
             info.updateValue(indexPathFromAccessibilityLabel, forKey: "indexPath")
             notifications.postDeleteNoteGestureNotification(info, object: nil)

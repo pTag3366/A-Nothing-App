@@ -15,6 +15,9 @@ class NothingCollectionView: UICollectionView {
     
     private let logger = Logger(subsystem: "com.josephk.Nothing", category: "persistence")
     
+    weak var undoDelegate: PresentUndoOption?
+    private var undoOperation = UndoManager()
+    
     lazy var persistentContainer: NSPersistentContainer = {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         return appDelegate!.persistenceContainer
@@ -60,6 +63,7 @@ class NothingCollectionView: UICollectionView {
         register(NothingCollectionViewReusableView.self,
                  forSupplementaryViewOfKind: NothingCollectionViewReusableView.sectionHeader,
                  withReuseIdentifier: NothingCollectionViewReusableView.sectionHeader)
+        undoOperation.registerUndo(withTarget: self, selector: #selector(NothingCollectionView.undoNoteDeletion(_:)), object: nil)
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         accessibilityLabel = "NothingCollectionView"
     }
@@ -166,12 +170,28 @@ extension NothingCollectionView {
     @objc func deleteNote(_ notification: Notification) {
         logger.debug("\(#function): \(notification)")
         guard let index = notification.userInfo?["indexPath"] as? IndexPath,
-              let _ = fetchedResultsController.object(at: index).textData   //veryfy that note has data
+              let _ = fetchedResultsController.object(at: index).textData   //verify that note has data
         else {
             return logger.error("\(NoteError.incompleteData(description: "\(#function)"))")
         }
-        
-        removeNoteFromViewContext(at: index)
+        let note = fetchedResultsController.object(at: index)
+        removeNoteFromViewContext(at: index) { [weak self] success in
+            if (success) {
+                self?.undoDelegate?.showUndoAlertController(for: note)
+            }
+        }
+    }
+    
+    @objc func undoNoteDeletion(_ note: Note) {
+        let viewContext = persistentContainer.viewContext
+        viewContext.perform {
+            let objToRestore = viewContext.object(with: note.objectID)
+            viewContext.insert(objToRestore)
+        }
+    }
+    
+    @objc func undoNoteCancelled(_ note: Note) {
+        removeNoteFromPersistentStore(note)
     }
     
     private func updateNote(note: Note, data: Data, task: NSManagedObjectContext) {
@@ -184,9 +204,17 @@ extension NothingCollectionView {
         Note.insertNote(with: note, task: task)
     }
     
-    private func removeNoteFromViewContext(at indexPath: IndexPath) {
+    private func removeNoteFromViewContext(at indexPath: IndexPath,
+                                           completion: ((Bool) -> Void)? = nil) {
         logger.debug("\(#function)")
-        Note.removeNoteFromViewContext(store: persistentContainer, controller: fetchedResultsController, at: indexPath)
+        let note = fetchedResultsController.object(at: indexPath)
+        let viewCtxId = persistentContainer.viewContext.object(with: note.objectID)
+        persistentContainer.viewContext.perform { [weak self] in
+            self?.persistentContainer.viewContext.delete(viewCtxId)
+            if ((self?.persistentContainer.viewContext.hasChanges) != nil) {
+                completion!(true)
+            }
+        }
     }
     
     private func removeNoteFromPersistentStore(_ note: Note) {
@@ -205,13 +233,12 @@ extension NothingCollectionView: NSFetchedResultsControllerDelegate {
     }
     
     func controller(_ controller: NSFetchedResultsController<any NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        guard let note = anObject as? Note else { return }
+        guard let _ = anObject as? Note else { return }
         
         switch type {
         case .insert:
             logger.debug("added note at section: \(newIndexPath!.section), row: \(newIndexPath!.row)")
         case .delete:
-            removeNoteFromPersistentStore(note)
             if let indexPath = indexPath {
                 scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
             }

@@ -17,7 +17,6 @@ class NothingTextView: UITextView {
         delegate = self
         accessibilityLabel = "NothingTextView"
         configure()
-        
     }
     
     deinit {

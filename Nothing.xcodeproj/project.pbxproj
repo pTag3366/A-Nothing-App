@@ -56,6 +56,7 @@
 		6A31CBA22BB29FBA001F4EE8 /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
 		6A3A29242B9A94500013BB35 /* IndexPath+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IndexPath+Extension.swift"; sourceTree = "<group>"; };
 		6A3A29262B9A94D40013BB35 /* NothingCollectionViewCell+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NothingCollectionViewCell+Extension.swift"; sourceTree = "<group>"; };
+		6A3C862D2BDB80B100077F33 /* NothingSettings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NothingSettings.xcconfig; sourceTree = "<group>"; };
 		6A55CEBD2B7FC756007EFBD4 /* Nothing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nothing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A55CEC02B7FC756007EFBD4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6A55CEC22B7FC756007EFBD4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -124,6 +125,7 @@
 		6A55CEB42B7FC756007EFBD4 = {
 			isa = PBXGroup;
 			children = (
+				6A3C862D2BDB80B100077F33 /* NothingSettings.xcconfig */,
 				6A55CEBF2B7FC756007EFBD4 /* Nothing */,
 				6A55CED62B7FC75C007EFBD4 /* NothingTests */,
 				6A55CEE02B7FC75C007EFBD4 /* NothingUITests */,
